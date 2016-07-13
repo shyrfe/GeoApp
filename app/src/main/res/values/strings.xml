@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GeoApp</string>
+    <string name="comment_but">Записать текущее</string>
+    <string name="ONtog">Включить</string>
+    <string name="OFFtog">Выключить</string>
+    <string name="locationError">Нет данных со спутника</string>
+    <string name="locationSuccess">Данные записаны</string>
+</resources>
