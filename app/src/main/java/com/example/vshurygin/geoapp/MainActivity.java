@@ -1,8 +1,8 @@
 package com.example.vshurygin.geoapp;
 /*
- 1) переделать переменные
- 2) добавить выключатель для текущего \
- 3) добавить карты с отображением точе
+ 1) переделать переменные+
+ 2) добавить выключатель для записи текущего
+ 3) добавить карты с отображением точек
  4) кнопка плей которая отображает последовательно точки
  5) вычесление средней скорости
  6) вычесление дистанции
@@ -44,55 +44,55 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 public class MainActivity extends AppCompatActivity {
 
-    private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
-    private Button CommentButton;
-    private ToggleButton ONOFFtogButton;
-    private LocationManager locationManager;
-    private TextView StatusView;
-    private EditText CommentBar;
+    //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
+    private Button mCommentButton;
+    private ToggleButton mOnOffTogButton;
+    private LocationManager mLocationManager;
+    private TextView mStatusView;
+    private EditText mCommentBar;
 
-    private GeoAppService localGeoAppService;
-    private boolean isServiceBind = false;
+    private GeoAppService mLocalGeoAppService;
+    private boolean mIsServiceBind = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        StatusView = (TextView)findViewById(R.id.StatusView);
-        StatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
+        mStatusView = (TextView)findViewById(R.id.StatusView);
+        mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        CommentButton = (Button) findViewById(R.id.CommentButton);
-        CommentBar = (EditText) findViewById(R.id.CommentText);
-        CommentButton.setOnClickListener(new View.OnClickListener() {
+        mCommentButton = (Button) findViewById(R.id.CommentButton);
+        mCommentBar = (EditText) findViewById(R.id.CommentText);
+        mCommentButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
-                final String CommentStr = CommentBar.getText().toString();
-                if(isServiceBind)
+                final String CommentStr = mCommentBar.getText().toString();
+                if(mIsServiceBind)
                 {
                     Timer commentTimer = new Timer();
                     commentTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            localGeoAppService.setComment(CommentStr);
+                            mLocalGeoAppService.setComment(CommentStr);
                         }
                     },2000);
-                    CommentBar.setText("");
+                    mCommentBar.setText("");
                 }
                 else
                 {
-                    StatusView.setText("Service Status: ON");
-                    ONOFFtogButton.setChecked(true);
+                    mStatusView.setText("Service Status: ON");
+                    mOnOffTogButton.setChecked(true);
 
                     Timer commentTimer = new Timer();
                     commentTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            localGeoAppService.setComment(CommentStr);
+                            mLocalGeoAppService.setComment(CommentStr);
                         }
                     },2000);
-                    CommentBar.setText("");
+                    mCommentBar.setText("");
                 }
 
             }
@@ -100,14 +100,14 @@ public class MainActivity extends AppCompatActivity {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ONOFFtogButton = (ToggleButton)findViewById(R.id.ONOFFtogButton);
-        ONOFFtogButton.setChecked(isServiceRunning(GeoAppService.class)?true:false);
-        ONOFFtogButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mOnOffTogButton = (ToggleButton)findViewById(R.id.ONOFFtogButton);
+        mOnOffTogButton.setChecked(isServiceRunning(GeoAppService.class)?true:false);
+        mOnOffTogButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isCheaked)
             {
                 if(isCheaked)
                 {
-                    StatusView.setText("Service Status: ON");
+                    mStatusView.setText("Service Status: ON");
                     Intent intent = new Intent(MainActivity.this, GeoAppService.class);
                     startService(intent);
                     bindService(intent,mServiceConection, Context.BIND_AUTO_CREATE);
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run()
                         {
-                            if(!localGeoAppService.isProvideEnabled())
+                            if(!mLocalGeoAppService.isProvideEnabled())
                             {
                                 startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                             }
@@ -126,12 +126,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    StatusView.setText("Service Status: OFF");
-                    if (isServiceBind)
+                    mStatusView.setText("Service Status: OFF");
+                    if (mIsServiceBind)
                     {
-                        localGeoAppService.timerSwitch(false);
+                        mLocalGeoAppService.timerSwitch(false);
                         unbindService(mServiceConection);
-                        isServiceBind = false;
+                        mIsServiceBind = false;
                     }
                     Intent intent = new Intent(MainActivity.this, GeoAppService.class);
                     stopService(intent);
@@ -144,13 +144,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MyBinder myBinder = (MyBinder)service;
-            localGeoAppService = myBinder.getService();
-            isServiceBind = true;
+            mLocalGeoAppService = myBinder.getService();
+            mIsServiceBind = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            isServiceBind = false;
+            mIsServiceBind = false;
         }
     };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
