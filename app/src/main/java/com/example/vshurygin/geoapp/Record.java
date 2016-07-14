@@ -202,6 +202,7 @@ public class Record
                     case "Id":
                     {
                         mId = Long.valueOf(strMass[i+1]);
+                        break;
                     }
                     case "TimeStamp":
                     {

@@ -177,6 +177,7 @@ public class RecordLog {
                         recordString.append(tmp);
                     }
                     AllRecords.add(Record.parse(recordString.toString()));
+                    recordString = null;
                 }
             }
             reader.close();

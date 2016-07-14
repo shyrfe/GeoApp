@@ -2,8 +2,8 @@ package com.example.vshurygin.geoapp;
 /*
  1) переделать переменные+
  2) добавить выключатель для записи текущего
- 3) добавить карты
-  3.1)с отображением точек
+ 3) добавить карты+
+  3.1)с отображением точек+
  4) кнопка плей которая отображает последовательно точки
  5) вычесление средней скорости
  6) вычесление дистанции
@@ -45,6 +45,8 @@ import com.example.vshurygin.geoapp.GeoAppService.MyBinder;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -127,8 +129,12 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                             }
+
+                            mLocalGeoAppService.mapManipulation.addAllMarkers(mGoogleMap);
                         }
                     },500);
+
+
                 }
                 else
                 {
@@ -189,5 +195,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
 }

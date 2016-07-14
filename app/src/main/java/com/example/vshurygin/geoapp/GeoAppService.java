@@ -69,8 +69,10 @@ public class GeoAppService extends Service {
     private Timer mTimer;
     private boolean mProvideEnabledStatus = true;
     private ArrayList<String> mCommentCache = new ArrayList<String>();
-    private RecordLog mRecordLog;
     private TelephonyManager mTelephonyManager;
+
+    public  RecordLog mRecordLog;
+    public MapManipulation mapManipulation;
 
     public GeoAppService() {
     }
@@ -91,6 +93,8 @@ public class GeoAppService extends Service {
 
         mTelephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         mRecordLog = new RecordLog(FILE_PATH,GeoAppService.this);
+
+        mapManipulation = new MapManipulation(mRecordLog);
 
         mTimer = new Timer();
         mTimer.schedule(new XMLpackTimer(),0,30000);
@@ -126,7 +130,6 @@ public class GeoAppService extends Service {
     @Override
     public boolean onUnbind(Intent intent)
     {
-        //recordLog.WriterSwitch(false);
         Log.d("BindStatus","BindOFF");
         if (mTimer != null) {
             mTimer.cancel();
