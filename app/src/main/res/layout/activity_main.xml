@@ -18,11 +18,11 @@
         android:id="@+id/CommentText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:background="#cbcbcb"
-        android:gravity="top" />
+        android:gravity="top"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <ToggleButton
         android:layout_width="wrap_content"
@@ -31,12 +31,9 @@
         android:id="@+id/ONOFFtogButton"
         android:textOff="@string/ONtog"
         android:textOn="@string/OFFtog"
-        android:layout_marginTop="76dp"
-        android:layout_below="@+id/StatusView"
-        android:layout_alignRight="@+id/CommentButton"
-        android:layout_alignEnd="@+id/CommentButton"
-        android:layout_alignLeft="@+id/CommentButton"
-        android:layout_alignStart="@+id/CommentButton" />
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/mapView"
+        android:layout_alignEnd="@+id/mapView" />
 
     <Button
         android:layout_width="wrap_content"
@@ -44,8 +41,7 @@
         android:text="@string/comment_but"
         android:id="@+id/CommentButton"
         android:layout_above="@+id/CommentText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="53dp" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -53,9 +49,20 @@
         android:text="New Text"
         android:id="@+id/StatusView"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/ONOFFtogButton"
-        android:layout_alignEnd="@+id/ONOFFtogButton"
-        android:layout_alignLeft="@+id/ONOFFtogButton"
-        android:layout_alignStart="@+id/ONOFFtogButton" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/CommentButton"
+        android:layout_toStartOf="@+id/CommentButton"
+        android:layout_alignBottom="@+id/ONOFFtogButton" />
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mapView"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ONOFFtogButton"
+        android:layout_above="@+id/CommentButton" />
 
 </RelativeLayout>

@@ -2,7 +2,8 @@ package com.example.vshurygin.geoapp;
 /*
  1) переделать переменные+
  2) добавить выключатель для записи текущего
- 3) добавить карты с отображением точек
+ 3) добавить карты
+  3.1)с отображением точек
  4) кнопка плей которая отображает последовательно точки
  5) вычесление средней скорости
  6) вычесление дистанции
@@ -18,6 +19,7 @@ import android.nfc.Tag;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -42,6 +44,8 @@ import java.util.TimerTask;
 import com.example.vshurygin.geoapp.GeoAppService.MyBinder;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import com.google.android.gms.maps.*;
+
 public class MainActivity extends AppCompatActivity {
 
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager mLocationManager;
     private TextView mStatusView;
     private EditText mCommentBar;
+    private GoogleMap mGoogleMap;
 
     private GeoAppService mLocalGeoAppService;
     private boolean mIsServiceBind = false;
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        createMapView();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mStatusView = (TextView)findViewById(R.id.StatusView);
         mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
@@ -154,6 +160,25 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void createMapView()
+    {
+        try{
+            if (mGoogleMap == null)
+            {
+                mGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMap();
+                if (mGoogleMap == null)
+                {
+                    Toast.makeText(MainActivity.this,
+                            "Error creating map",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public boolean isServiceRunning(Class<?> serviceClass)
     {
         ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
@@ -164,4 +189,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
 }
