@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -31,13 +33,24 @@ public class MapManipulation {
     private ArrayList<Record> mAllRecords;
     private ArrayList<Marker> mAllMarkers;
 
+    private boolean mShowMarkersWithDelayIsSkip = false;
+
     public MapManipulation(GoogleMap googleMap, RecordLog recordLog)
     {
         mGoogleMap = googleMap;
         mRecordLog = recordLog;
         mAllRecords = (ArrayList<Record>) mRecordLog.readAll();
         mAllMarkers = new ArrayList<Marker>();
-        addAllMarkers();
+        try
+        {
+            addAllMarkers();
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mAllRecords.get(0).getLatitude(),mAllRecords.get(0).getLongitude()),17));
+        }
+        catch (Exception e )
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public void addAllMarkers()
@@ -50,7 +63,7 @@ public class MapManipulation {
             {
                 for(Record rec : mAllRecords)
                 {
-                    Marker mrk = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(rec.getLatitude(),rec.getLongitude())).visible(false));
+                    Marker mrk = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(rec.getLatitude(),rec.getLongitude())).visible(false).title(rec.getComment()));
                     mAllMarkers.add(mrk);
                 }
             }
@@ -66,7 +79,7 @@ public class MapManipulation {
             @Override
             public void run()
             {
-                addMarker(mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(record.getLatitude(),record.getLongitude())).visible(false)));
+                addMarker(mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(record.getLatitude(),record.getLongitude())).visible(false).title(record.getComment())));
             }
         };
         mainHandler.post(myRunnable);
@@ -145,18 +158,22 @@ public class MapManipulation {
         };
         mainHandler.post(myRunnable);
     }
-    public void showMarkersWithDelay()
+    public boolean showMarkersWithDelay()
     {
+        mShowMarkersWithDelayIsSkip = false;
         final Handler mainHandler = new Handler(Looper.getMainLooper());
-
+        hideAllMarkers();
         for (final Marker mrk : mAllMarkers)
         {
+            if(mShowMarkersWithDelayIsSkip)
+            {continue;}
             try
             {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
                         mrk.setVisible(true);
+                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(mrk.getPosition()));
                     }
                 };
 
@@ -167,24 +184,12 @@ public class MapManipulation {
             catch (Exception e)
             {e.printStackTrace();}
         }
-
-        /*Runnable myRunnable = new Runnable() {
-            @Override
-            public void run()
-            {
-                for (Marker mrk: mAllMarkers)
-                {
-                    try{
-                        Thread.sleep(1000);
-                        mrk.setVisible(true);
-                    }
-                    catch (Exception e)
-                    {e.printStackTrace();}
-
-                }
-            }
-        };
-        mainHandler.post(myRunnable);*/
+        mShowMarkersWithDelayIsSkip = false;
+        return true;
+    }
+    public void skipShowMarkersWithDelay()
+    {
+        mShowMarkersWithDelayIsSkip = true;
     }
 
     private void addMarker(Marker marker)

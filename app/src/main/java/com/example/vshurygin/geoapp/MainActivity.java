@@ -4,10 +4,18 @@ package com.example.vshurygin.geoapp;
  2) добавить выключатель для записи текущего
  3) добавить карты+
   3.1)с отображением точек+
- 4) кнопка плей которая отображает последовательно точки
+ 4) кнопка плей которая отображает последовательно точки+
  5) вычесление средней скорости+
  6) вычесление дистанции+
  7) починить "танцующие" кнопки
+ 8) реализовать обновление точек в реальном времени+
+ 9) фокусировать камеру на точке
+ 10)прикрутить базу данных
+ 11)индекс на коммент
+ 12)прикрутить зуум к точке если она далеко
+ 13)плей пауз(менять кнопку плэй)
+ 14)скрость прокрутки плэя
+ 15)рисовать полоску между точками
 * */
 import android.Manifest;
 import android.app.ActivityManager;
@@ -55,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static GoogleMap sGoogleMap;
 
+    final private int UPDATE_MARKERS_TIME = 2000;
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     private Button mCommentButton;
+    private Button mPlayDelayMarkersButton;
     private ToggleButton mOnOffTogButton;
     private LocationManager mLocationManager;
     private TextView mStatusView;
@@ -66,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GeoAppService mLocalGeoAppService;
     private boolean mIsServiceBind = false;
+    private boolean mIsPlayDelayMarkersOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +115,50 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         },0,2000);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        mPlayDelayMarkersButton = (Button)findViewById(R.id.PlayDelayMarkers);
+        mPlayDelayMarkersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if (!mIsPlayDelayMarkersOn)
+                {
+                    if (mIsServiceBind && (mLocalGeoAppService.mapManipulation != null))
+                    {
+                        mOnOffTogButton.setClickable(false);
+                        mIsPlayDelayMarkersOn = true;
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mIsPlayDelayMarkersOn = !mLocalGeoAppService.mapManipulation.showMarkersWithDelay();
+                                mOnOffTogButton.setClickable(true);
+                            }
+                        }).start();
+                    }
+                    else
+                    {
+                        Log.d("Play","Server not start!");
+                        Toast.makeText(MainActivity.this,"Запустите сервис!",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else
+                {
+                    Log.d("Play","notStart");
+                    mLocalGeoAppService.mapManipulation.skipShowMarkersWithDelay();
+                }
+            }
+        });
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        Timer markersUpdateTimer = new Timer();
+        markersUpdateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (mIsServiceBind && (mLocalGeoAppService.mapManipulation != null) && (!mIsPlayDelayMarkersOn))
+                {
+                    mLocalGeoAppService.mapManipulation.showAllMarkers();
+                }
+            }
+        },0,UPDATE_MARKERS_TIME);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mCommentButton = (Button) findViewById(R.id.CommentButton);
