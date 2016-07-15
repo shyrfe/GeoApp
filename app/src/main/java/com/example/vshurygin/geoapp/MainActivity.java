@@ -5,8 +5,9 @@ package com.example.vshurygin.geoapp;
  3) добавить карты+
   3.1)с отображением точек+
  4) кнопка плей которая отображает последовательно точки
- 5) вычесление средней скорости
- 6) вычесление дистанции
+ 5) вычесление средней скорости+
+ 6) вычесление дистанции+
+ 7) починить "танцующие" кнопки
 * */
 import android.Manifest;
 import android.app.ActivityManager;
@@ -18,7 +19,9 @@ import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
@@ -50,13 +53,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static GoogleMap sGoogleMap;
+
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     private Button mCommentButton;
     private ToggleButton mOnOffTogButton;
     private LocationManager mLocationManager;
     private TextView mStatusView;
+    private TextView mSpeedDistanceStatus;
     private EditText mCommentBar;
-    private GoogleMap mGoogleMap;
+    //private GoogleMap mGoogleMap;
 
     private GeoAppService mLocalGeoAppService;
     private boolean mIsServiceBind = false;
@@ -70,6 +76,35 @@ public class MainActivity extends AppCompatActivity {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mStatusView = (TextView)findViewById(R.id.StatusView);
         mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        mSpeedDistanceStatus = (TextView)findViewById(R.id.speedDistanceView);
+        Timer speedDistanceTimer = new Timer();
+        final Handler mainHandler = new Handler(Looper.getMainLooper());
+        speedDistanceTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if((mIsServiceBind != false) && (mLocalGeoAppService.mapManipulation != null))
+                {
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSpeedDistanceStatus.setText(String.valueOf(mLocalGeoAppService.mapManipulation.getAverageSpeed()) + " m/s\n" +
+                                    String.valueOf(mLocalGeoAppService.mapManipulation.getDistance() + "m"));
+                        }
+                    });
+                }
+                else
+                {
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSpeedDistanceStatus.setText("0 m/s\n0 m");
+                        }
+                    });
+                }
+            }
+        },0,2000);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mCommentButton = (Button) findViewById(R.id.CommentButton);
         mCommentBar = (EditText) findViewById(R.id.CommentText);
@@ -130,17 +165,17 @@ public class MainActivity extends AppCompatActivity {
                                 startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                             }
 
-                            mLocalGeoAppService.mapManipulation.addAllMarkers(mGoogleMap);
+                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
+                            mLocalGeoAppService.mapManipulation.showAllMarkers();
                         }
                     },500);
-
-
                 }
                 else
                 {
                     mStatusView.setText("Service Status: OFF");
                     if (mIsServiceBind)
                     {
+                        mLocalGeoAppService.mapManipulation.hideAllMarkers();
                         mLocalGeoAppService.timerSwitch(false);
                         unbindService(mServiceConection);
                         mIsServiceBind = false;
@@ -151,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private ServiceConnection mServiceConection = new ServiceConnection() {
         @Override
@@ -169,10 +205,10 @@ public class MainActivity extends AppCompatActivity {
     private void createMapView()
     {
         try{
-            if (mGoogleMap == null)
+            if (sGoogleMap == null)
             {
-                mGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMap();
-                if (mGoogleMap == null)
+                sGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMap();
+                if (sGoogleMap == null)
                 {
                     Toast.makeText(MainActivity.this,
                             "Error creating map",Toast.LENGTH_SHORT).show();

@@ -94,8 +94,10 @@ public class GeoAppService extends Service {
         mTelephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         mRecordLog = new RecordLog(FILE_PATH,GeoAppService.this);
 
-        mapManipulation = new MapManipulation(mRecordLog);
-
+        if (MainActivity.sGoogleMap != null)
+        {
+            mapManipulation = new MapManipulation(MainActivity.sGoogleMap,mRecordLog);
+        }
         mTimer = new Timer();
         mTimer.schedule(new XMLpackTimer(),0,30000);
 
@@ -112,6 +114,10 @@ public class GeoAppService extends Service {
         if (mTimer != null) {
             mTimer.cancel();
             mTimer.purge();
+        }
+        if (mapManipulation != null)
+        {
+            mapManipulation.removeAllMarkers();
         }
     }
 
@@ -142,7 +148,12 @@ public class GeoAppService extends Service {
     {
         if(mLocalLocation != null)
         {
-            mRecordLog.add(Record.parse(mLocalLocation,mTelephonyManager.getDeviceId(),comment));
+            Record record = Record.parse(mLocalLocation,mTelephonyManager.getDeviceId(),comment);
+            mRecordLog.add(record);
+
+            if (mapManipulation != null)
+            {mapManipulation.addRecord(record);}
+
             Log.d("Comment","OK");
         }
         else
@@ -184,7 +195,12 @@ public class GeoAppService extends Service {
     {
         for (String str : mCommentCache)
         {
-            mRecordLog.add(Record.parse(mLocalLocation,mTelephonyManager.getDeviceId(),str));
+            Record record = Record.parse(mLocalLocation,mTelephonyManager.getDeviceId(),str);
+
+            mRecordLog.add(record);
+            if (mapManipulation != null)
+            {mapManipulation.addRecord(record);}
+
             Log.d("commentCache","\""+str+"\" comment add");
         }
 
@@ -235,7 +251,13 @@ public class GeoAppService extends Service {
         {
             if (mLocalLocation != null)
             {
-                mRecordLog.add(Record.parse(mLocalLocation,mTelephonyManager.getDeviceId()));
+                Record record = Record.parse(mLocalLocation,mTelephonyManager.getDeviceId());
+                mRecordLog.add(record);
+                if (mapManipulation != null)
+                {
+                    mapManipulation.addRecord(record);
+                    //mapManipulation.showAllMarkers();
+                }
                 Log.d("Count",String.valueOf(mRecordLog.count()));
             }
         }
