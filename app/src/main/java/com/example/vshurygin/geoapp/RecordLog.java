@@ -1,7 +1,10 @@
 package com.example.vshurygin.geoapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -31,6 +34,7 @@ public class RecordLog {
 
     private Context mContext;
     private SharedPreferences mSharPref;
+    private RecordsDataBase mRecordsDataBase;
     private File mSdFile;
     private int mLastRead = 0;
     private String mPath;
@@ -39,17 +43,34 @@ public class RecordLog {
 
     RecordLog(String path, Context context)
     {
-            mPath = path;
-            mContext = context;
+            /*mPath = path;*/
+        mContext = context;
 
-            File sdPath = Environment.getExternalStorageDirectory();
+        mRecordsDataBase = new RecordsDataBase(mContext);
+        SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+        //db.delete("records",null,null);
+        //db.close();
+        //SQLiteDatabase db = dataBase.getWritableDatabase();
+        //ContentValues cv = new ContentValues();
+        //cv.put("timestamp",10);
+        //db.insert("records",null,cv);
+        //Cursor c = db.query("records",null,null,null,null,null,null);
+       // if (c.moveToFirst())
+        //{
+            //int time = c.getColumnIndex("timestamp");
+            //Log.d("DATABASE",String.valueOf(c.getInt(time)));
+
+        //}
+        //dataBase.close();
+
+            /*File sdPath = Environment.getExternalStorageDirectory();
             sdPath = new File(sdPath.getAbsolutePath()+"/"+mPath);
-            sdPath.mkdirs();
+            sdPath.mkdirs();*/
 
-            mSdFile = new File(sdPath,FILE_NAME);
-            mSharPref = context.getSharedPreferences(Record.LOCAL_PREFERENCES,context.MODE_PRIVATE);
+            /*mSdFile = new File(sdPath,FILE_NAME);
+            mSharPref = context.getSharedPreferences(Record.LOCAL_PREFERENCES,context.MODE_PRIVATE);*/
 
-            try
+            /*try
             {
                     if (mSdFile.exists() && mSdFile.isFile())
                     {
@@ -77,7 +98,7 @@ public class RecordLog {
             {
                 se.printStackTrace();
             }
-
+*/
     }
 
     public void add(Record r)
@@ -96,7 +117,10 @@ public class RecordLog {
         }
          */
 
-        try
+        SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+        db.insert("records",null,r.toContentValues());
+        db.close();
+        /*try
         {
             clearLastLine(mSdFile);
             if (!mIsOpen && (!mSdFile.exists()))
@@ -155,13 +179,53 @@ public class RecordLog {
         catch (IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
+
+
     }
     public List<Record> readAll()
     {
-        WriterSwitch(false);
         ArrayList<Record> AllRecords = new ArrayList<Record>();
-        try
+        SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+        Cursor c = db.query("records",null,null,null,null,null,null);
+
+        try{
+            if (c.moveToFirst())
+            {
+                int idColIndex = c.getColumnIndex("id");
+                int timeStampColIndex = c.getColumnIndex("timestamp");
+                int imeiColIndex = c.getColumnIndex("imei");
+                int intervalColIndex = c.getColumnIndex("interval");
+                int commentColIndex = c.getColumnIndex("comment");
+                int latitudeColIndex = c.getColumnIndex("latitude");
+                int longitudeColIndex = c.getColumnIndex("longitude");
+                int radiusColIndex = c.getColumnIndex("radius");
+                int speedColIndex = c.getColumnIndex("speed");
+
+                do
+                {
+                    Record r = new Record(
+                            c.getLong(idColIndex),
+                            c.getLong(timeStampColIndex),
+                            c.getString(imeiColIndex),
+                            c.getInt(intervalColIndex),
+                            c.getString(commentColIndex),
+                            c.getDouble(latitudeColIndex),
+                            c.getDouble(longitudeColIndex),
+                            c.getFloat(radiusColIndex),
+                            c.getFloat(speedColIndex)
+                    );
+                    AllRecords.add(r);
+                }
+                while(c.moveToNext());
+            }
+            db.close();
+        }
+        catch (Exception e)
+        {e.printStackTrace();}
+
+
+        /*try
         {
             BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
             String tmp;
@@ -193,13 +257,37 @@ public class RecordLog {
         finally
         {
             WriterSwitch(true);
-        }
+        }*/
         return AllRecords;
     }
 
     public int count()
     {
-        int length = mSharPref.getInt("RECORD_COUNT",0);
+        try {
+            SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+            String[] com = new String[]{"count(*) as Count"};
+            Cursor c = db.query("records", com, null, null, null, null, null);
+            String str;
+            str = "";
+            if (c != null) {
+                if (c.moveToFirst()) {
+
+                    do {
+                        for (String cn : c.getColumnNames()) {
+                            str = str.concat(c.getString(c.getColumnIndex(cn)));
+                        }
+                    } while (c.moveToNext());
+                }
+                c.close();
+            } else
+                Log.d("Count", "Cursor is null");
+
+            db.close();
+            return Integer.valueOf(str);
+        }
+        catch (Exception e)
+        {e.printStackTrace();}
+        //int length = mSharPref.getInt("RECORD_COUNT",0);
         /*try
         {
             BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
@@ -223,14 +311,49 @@ public class RecordLog {
             exception.printStackTrace();
         }
         */
-        return length;
 
+        return 0;
     }
 
     public Record read()
     {
         Record record;
-        WriterSwitch(false);
+        SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+        Cursor c = db.query("records",null,null,null,null,null,null);
+
+        if (mLastRead == c.getCount())
+        {return null;}
+        else
+        {
+            c.move(mLastRead);
+
+            int idColIndex = c.getColumnIndex("id");
+            int timeStampColIndex = c.getColumnIndex("timestamp");
+            int imeiColIndex = c.getColumnIndex("imei");
+            int intervalColIndex = c.getColumnIndex("interval");
+            int commentColIndex = c.getColumnIndex("comment");
+            int latitudeColIndex = c.getColumnIndex("latitude");
+            int longitudeColIndex = c.getColumnIndex("longitude");
+            int radiusColIndex = c.getColumnIndex("radius");
+            int speedColIndex = c.getColumnIndex("speed");
+
+            Record r = new Record(
+                    c.getLong(idColIndex),
+                    c.getLong(timeStampColIndex),
+                    c.getString(imeiColIndex),
+                    c.getInt(intervalColIndex),
+                    c.getString(commentColIndex),
+                    c.getDouble(latitudeColIndex),
+                    c.getDouble(longitudeColIndex),
+                    c.getFloat(radiusColIndex),
+                    c.getFloat(speedColIndex)
+            );
+            mLastRead = c.getPosition()+1;
+
+            return r;
+        }
+
+        /*WriterSwitch(false);
         try
         {
             BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
@@ -266,9 +389,9 @@ public class RecordLog {
         finally
         {
             WriterSwitch(true);
-        }
+        }*/
 
-        return null;
+        //return null;
     }
 
     private void clearLastLine(File file)
@@ -307,6 +430,7 @@ public class RecordLog {
         }
         WriterSwitch(true);
     }
+
     public void WriterSwitch(boolean wrswitch)
     {
         if(wrswitch == true)

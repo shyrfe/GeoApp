@@ -10,7 +10,7 @@ package com.example.vshurygin.geoapp;
  7) починить "танцующие" кнопки
  8) реализовать обновление точек в реальном времени+
  9) фокусировать камеру на точке
- 10)прикрутить базу данных
+ 10)прикрутить базу данных+
  11)индекс на коммент
  12)прикрутить зуум к точке если она далеко
  13)плей пауз(менять кнопку плэй)
@@ -20,10 +20,13 @@ package com.example.vshurygin.geoapp;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.nfc.Tag;
 import android.os.Build;
 import android.os.Environment;
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         createMapView();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mStatusView = (TextView)findViewById(R.id.StatusView);
         mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));

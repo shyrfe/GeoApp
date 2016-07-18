@@ -1,5 +1,6 @@
 package com.example.vshurygin.geoapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -182,6 +183,21 @@ public class Record
         str.append("</coordinate>\n");
 
         return str.toString();
+    }
+    public ContentValues toContentValues()
+    {
+        ContentValues cv = new ContentValues();
+
+        cv.put("timestamp",mTimestamp);
+        cv.put("imei",mImei);
+        cv.put("interval",mInterval);
+        cv.put("comment",mComment);
+        cv.put("latitude",mLatitude);
+        cv.put("longitude",mLongitude);
+        cv.put("radius",mRadius);
+        cv.put("speed",mSpeed);
+
+        return cv;
     }
 
     public static Record parse(String data)
