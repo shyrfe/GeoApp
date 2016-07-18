@@ -13,7 +13,7 @@ package com.example.vshurygin.geoapp;
  10)прикрутить базу данных+
  11)индекс на коммент
  12)прикрутить зуум к точке если она далеко
- 13)плей пауз(менять кнопку плэй)
+ 13)плей пауз(менять кнопку плэй) +
  14)скрость прокрутки плэя
  15)рисовать полоску между точками
 * */
@@ -45,6 +45,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mStatusView;
     private TextView mSpeedDistanceStatus;
     private EditText mCommentBar;
+    private SeekBar mMarkersDelaySpeedSeekBar;
+    private int mMarkersDelaySpeed = 0;
     //private GoogleMap mGoogleMap;
 
     private GeoAppService mLocalGeoAppService;
@@ -88,7 +91,23 @@ public class MainActivity extends AppCompatActivity {
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         createMapView();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        mMarkersDelaySpeedSeekBar = (SeekBar)findViewById(R.id.markersDelaySpeedSeekBar);
+        mMarkersDelaySpeedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mMarkersDelaySpeed = seekBar.getProgress();
+            }
+        });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mStatusView = (TextView)findViewById(R.id.StatusView);
         mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
@@ -104,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mSpeedDistanceStatus.setText(String.valueOf(mLocalGeoAppService.mapManipulation.getAverageSpeed()) + " m/s\n" +
+                            mSpeedDistanceStatus.setText(String.valueOf(mLocalGeoAppService.mapManipulation.getAverageSpeed()) + " m/s  :  " +
                                     String.valueOf(mLocalGeoAppService.mapManipulation.getDistance() + "m"));
                         }
                     });
@@ -114,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mSpeedDistanceStatus.setText("0 m/s\n0 m");
+                            mSpeedDistanceStatus.setText("0 m/s  :  0 m");
                         }
                     });
                 }
@@ -131,17 +150,32 @@ public class MainActivity extends AppCompatActivity {
                     if (mIsServiceBind && (mLocalGeoAppService.mapManipulation != null))
                     {
                         mOnOffTogButton.setClickable(false);
+                        mPlayDelayMarkersButton.setText(R.string.pauseButton);
                         mIsPlayDelayMarkersOn = true;
-                        new Thread(new Runnable() {
+
+                        Thread playDelayMarkersThread = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                mIsPlayDelayMarkersOn = !mLocalGeoAppService.mapManipulation.showMarkersWithDelay();
+                                boolean localPlayDelayMarkersOn = !mLocalGeoAppService.mapManipulation.showMarkersWithDelay(mMarkersDelaySpeed * 1000 + 1);
                                 mOnOffTogButton.setClickable(true);
+
+                                final Handler mainHandler = new Handler(Looper.getMainLooper());
+                                mainHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mPlayDelayMarkersButton.setText(R.string.playButton);
+                                    }});
+                                mIsPlayDelayMarkersOn = localPlayDelayMarkersOn;
                             }
-                        }).start();
+                            });
+                        if(playDelayMarkersThread.isAlive() == false)
+                        {
+                            playDelayMarkersThread.start();
+                        }
                     }
                     else
                     {
+                        mPlayDelayMarkersButton.setText(R.string.playButton);
                         Log.d("Play","Server not start!");
                         Toast.makeText(MainActivity.this,"Запустите сервис!",Toast.LENGTH_LONG).show();
                     }

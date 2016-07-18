@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -30,16 +31,21 @@ public class MapManipulation {
 
     private GoogleMap mGoogleMap;
     private RecordLog mRecordLog;
-    private ArrayList<Record> mAllRecords;
+    //private ArrayList<Record> mAllRecords;
     private ArrayList<Marker> mAllMarkers;
 
+    private CopyOnWriteArrayList<Record> mAllRecords = new CopyOnWriteArrayList<Record>();
     private boolean mShowMarkersWithDelayIsSkip = false;
 
     public MapManipulation(GoogleMap googleMap, RecordLog recordLog)
     {
         mGoogleMap = googleMap;
         mRecordLog = recordLog;
-        mAllRecords = (ArrayList<Record>) mRecordLog.readAll();
+        //mAllRecords = (ArrayList<Record>) mRecordLog.readAll();
+        try
+        { mAllRecords.addAll(mRecordLog.readAll()); }
+        catch (Exception e){e.printStackTrace();}
+
         mAllMarkers = new ArrayList<Marker>();
         try
         {
@@ -158,11 +164,12 @@ public class MapManipulation {
         };
         mainHandler.post(myRunnable);
     }
-    public boolean showMarkersWithDelay()
+    public boolean showMarkersWithDelay(final int delay)
     {
         mShowMarkersWithDelayIsSkip = false;
         final Handler mainHandler = new Handler(Looper.getMainLooper());
         hideAllMarkers();
+
         for (final Marker mrk : mAllMarkers)
         {
             if(mShowMarkersWithDelayIsSkip)
@@ -173,17 +180,22 @@ public class MapManipulation {
                     @Override
                     public void run() {
                         mrk.setVisible(true);
-                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(mrk.getPosition()));
+                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(mrk.getPosition()),delay,null);
                     }
                 };
 
                 mainHandler.post(myRunnable);
 
-                Thread.sleep(SHOW_MARKERS_DELAY);
+                if (SHOW_MARKERS_DELAY > delay)
+                {Thread.sleep(SHOW_MARKERS_DELAY);}
+                else
+                {Thread.sleep(delay);}
+                //Thread.sleep(delay);
             }
             catch (Exception e)
             {e.printStackTrace();}
         }
+
         mShowMarkersWithDelayIsSkip = false;
         return true;
     }

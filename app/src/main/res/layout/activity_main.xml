@@ -75,9 +75,11 @@
         android:layout_alignTop="@+id/CommentButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/CommentText"
-        android:layout_toStartOf="@+id/PlayDelayMarkers"
-        android:layout_toLeftOf="@+id/PlayDelayMarkers" />
+        android:layout_toStartOf="@+id/seekBar"
+        android:maxWidth="50dp"
+        android:layout_above="@+id/seekBar"
+        android:layout_alignRight="@+id/markersDelaySpeedSeekBar"
+        android:layout_alignEnd="@+id/markersDelaySpeedSeekBar" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -91,5 +93,15 @@
         android:layout_above="@+id/CommentText"
         android:minWidth="100dp"
         android:nestedScrollingEnabled="false" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/markersDelaySpeedSeekBar"
+        android:layout_above="@+id/CommentText"
+        android:layout_toLeftOf="@+id/PlayDelayMarkers"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:max="5" />
 
 </RelativeLayout>

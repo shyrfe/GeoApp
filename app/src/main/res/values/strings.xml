@@ -6,4 +6,5 @@
     <string name="locationError">Нет данных со спутника</string>
     <string name="locationSuccess">Данные записаны</string>
     <string name="playButton">Play</string>
+    <string name="pauseButton">Pause</string>
 </resources>
