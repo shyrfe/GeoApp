@@ -11,14 +11,18 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.vision.text.internal.client.RecognitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -32,7 +36,9 @@ public class MapManipulation {
     private GoogleMap mGoogleMap;
     private RecordLog mRecordLog;
     //private ArrayList<Record> mAllRecords;
-    private ArrayList<Marker> mAllMarkers;
+    //private ArrayList<Marker> mAllMarkers;
+    //private Vector<Marker> mAllMarkers;
+    private  CopyOnWriteArrayList<Marker> mAllMarkers;
 
     private CopyOnWriteArrayList<Record> mAllRecords = new CopyOnWriteArrayList<Record>();
     private boolean mShowMarkersWithDelayIsSkip = false;
@@ -46,10 +52,14 @@ public class MapManipulation {
         { mAllRecords.addAll(mRecordLog.readAll()); }
         catch (Exception e){e.printStackTrace();}
 
-        mAllMarkers = new ArrayList<Marker>();
+        //mAllMarkers = new ArrayList<Marker>();
+        //mAllMarkers = new Vector<Marker>();
+        mAllMarkers = new CopyOnWriteArrayList<>();
+
         try
         {
             addAllMarkers();
+            //addAllPolylines();
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mAllRecords.get(0).getLatitude(),mAllRecords.get(0).getLongitude()),17));
         }
         catch (Exception e )
@@ -69,6 +79,7 @@ public class MapManipulation {
             {
                 for(Record rec : mAllRecords)
                 {
+                    //Log.d("RECORDSADDALL",rec.toString());
                     Marker mrk = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(rec.getLatitude(),rec.getLongitude())).visible(false).title(rec.getComment()));
                     mAllMarkers.add(mrk);
                 }
@@ -79,7 +90,7 @@ public class MapManipulation {
     public void addRecord(final Record record)
     {
         mAllRecords.add(record);
-
+        Log.d("RECORDADD",record.toString());
         Handler mainHandler = new Handler(Looper.getMainLooper());
         Runnable myRunnable = new Runnable() {
             @Override
@@ -164,23 +175,59 @@ public class MapManipulation {
         };
         mainHandler.post(myRunnable);
     }
-    public boolean showMarkersWithDelay(final int delay)
+
+    public boolean showMarkersWithDelay(final Activity activity, final int delay)
     {
         mShowMarkersWithDelayIsSkip = false;
         final Handler mainHandler = new Handler(Looper.getMainLooper());
         hideAllMarkers();
+        //showAllPolylines();
+        final PolylineOptions lineOnMap = new PolylineOptions();
 
-        for (final Marker mrk : mAllMarkers)
+        final CopyOnWriteArrayList<Polyline> polylines = new CopyOnWriteArrayList<>();
+
+        //for (final Marker mrk : mAllMarkers)
+        for (int i = 0; i < mAllMarkers.size(); i++)
         {
             if(mShowMarkersWithDelayIsSkip)
             {continue;}
             try
             {
+                final int f_i = i;
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        mrk.setVisible(true);
-                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(mrk.getPosition()),delay,null);
+                        //mrk.setVisible(true);
+                        mAllMarkers.get(f_i).setVisible(true);
+
+                        if ((f_i == 0) || (f_i == mAllMarkers.size()-1))
+                        {
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(mAllMarkers.get(f_i).getPosition()),delay,null);
+                        }
+                        else
+                        {
+                            LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
+                            latLngBuilder.include(mAllMarkers.get(f_i).getPosition());
+                            latLngBuilder.include(mAllMarkers.get(f_i-1).getPosition());
+                            int size = activity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(),size,size,0));
+
+                            /*if (mAllMarkers.get(f_i-1).getPosition().latitude > mAllMarkers.get(f_i).getPosition().latitude)
+                            {
+                                LatLngBounds twoMarkersBound = new LatLngBounds(mAllMarkers.get(f_i).getPosition(), mAllMarkers.get(f_i-1).getPosition());
+                                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(twoMarkersBound, 0));
+                            }
+                            else
+                            {
+                                //LatLngBounds twoMarkersBound = new LatLngBounds( mAllMarkers.get(f_i-1).getPosition(), mAllMarkers.get(f_i).getPosition());
+                                //mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(twoMarkersBound, 0));
+                            }
+                            //LatLngBounds twoMarkersBound = new LatLngBounds( mAllMarkers.get(f_i-1).getPosition(), mAllMarkers.get(f_i).getPosition());*/
+
+
+                        }
+                        lineOnMap.add(mAllMarkers.get(f_i).getPosition());
+                        polylines.add(mGoogleMap.addPolyline(lineOnMap));
                     }
                 };
 
@@ -190,12 +237,20 @@ public class MapManipulation {
                 {Thread.sleep(SHOW_MARKERS_DELAY);}
                 else
                 {Thread.sleep(delay);}
-                //Thread.sleep(delay);
             }
             catch (Exception e)
             {e.printStackTrace();}
         }
 
+        for (final Polyline pol : polylines)
+        {
+            mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                pol.remove();
+            }
+        });
+        }
         mShowMarkersWithDelayIsSkip = false;
         return true;
     }

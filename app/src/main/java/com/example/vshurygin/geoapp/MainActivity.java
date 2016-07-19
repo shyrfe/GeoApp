@@ -9,13 +9,13 @@ package com.example.vshurygin.geoapp;
  6) вычесление дистанции+
  7) починить "танцующие" кнопки
  8) реализовать обновление точек в реальном времени+
- 9) фокусировать камеру на точке
+ 9) фокусировать камеру на точке+
  10)прикрутить базу данных+
  11)индекс на коммент
- 12)прикрутить зуум к точке если она далеко
+ 12)прикрутить зуум к точке если она далеко+
  13)плей пауз(менять кнопку плэй) +
- 14)скрость прокрутки плэя
- 15)рисовать полоску между точками
+ 14)скрость прокрутки плэя+
+ 15)рисовать полоску между точками+
 * */
 import android.Manifest;
 import android.app.ActivityManager;
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                         Thread playDelayMarkersThread = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                boolean localPlayDelayMarkersOn = !mLocalGeoAppService.mapManipulation.showMarkersWithDelay(mMarkersDelaySpeed * 1000 + 1);
+                                boolean localPlayDelayMarkersOn = !mLocalGeoAppService.mapManipulation.showMarkersWithDelay(MainActivity.this,mMarkersDelaySpeed * 1000 + 1);
                                 mOnOffTogButton.setClickable(true);
 
                                 final Handler mainHandler = new Handler(Looper.getMainLooper());
