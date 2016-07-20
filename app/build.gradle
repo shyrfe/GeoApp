@@ -11,6 +11,11 @@ model {
             targetSdkVersion.apiLevel 23
             versionCode 1
             versionName "1.0"
+
+           /* ndk{
+                //modulename "hello-jni"
+                moduleName "OpenGLObjectModel"
+            }*/
         }
         buildTypes {
             release {
@@ -19,8 +24,15 @@ model {
             }
         }
         ndk {
+            //modulename "hello-jni"
             moduleName "OpenGLObjectModel"
         }
+        //sourceSets.main.jni.srcDirs = []
+        /*sourceSets.main {
+            jni.srcDirs = []
+            jniLibs.srcDir 'src/main/libs'
+        }*/
+
     }
 }
 

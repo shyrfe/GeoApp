@@ -16,6 +16,7 @@ package com.example.vshurygin.geoapp;
  13)плей пауз(менять кнопку плэй) +
  14)скрость прокрутки плэя+
  15)рисовать полоску между точками+
+ 16)OpenGL нарисовать нечто на карте нативными средствами
 * */
 import android.Manifest;
 import android.app.ActivityManager;
@@ -23,11 +24,13 @@ import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ServiceConnection;
+import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.nfc.Tag;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -45,6 +48,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,7 +72,11 @@ public class MainActivity extends AppCompatActivity {
     static {System.loadLibrary("OpenGLObjectModel");}
     public native String getMsgFromJni();
 
+
     public static GoogleMap sGoogleMap;
+
+    private GLSurfaceView mGlSurfaceView;
+    private boolean rendererSet;
 
     final private int UPDATE_MARKERS_TIME = 2000;
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
@@ -91,9 +99,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         createMapView();
-        Log.d("Native",getMsgFromJni());
+        //Log.d("Native",getMsgFromJni());
+        GLSurfaceInitialize();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mMarkersDelaySpeedSeekBar = (SeekBar)findViewById(R.id.markersDelaySpeedSeekBar);
         mMarkersDelaySpeedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -328,5 +338,43 @@ public class MainActivity extends AppCompatActivity {
             {return true;}
         }
         return false;
+    }
+
+    private void GLSurfaceInitialize()
+    {
+        ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+
+        final boolean isSupportsEs2 =
+                configurationInfo.reqGlEsVersion >= 0x20000 || isProbablyEmulator();
+
+        if (isSupportsEs2)
+        {
+            mGlSurfaceView = new GLSurfaceView(MainActivity.this);
+            if (isProbablyEmulator())
+            {
+                mGlSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
+            }
+            mGlSurfaceView.setEGLContextClientVersion(2);
+            mGlSurfaceView.setRenderer(new SurfaceRendererWrapper());
+            rendererSet = true;
+
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+            addContentView(mGlSurfaceView,layoutParams);
+            //setContentView(mGlSurfaceView);
+        }
+        else
+        {
+            Toast.makeText(MainActivity.this,"This device does not support OpenGl ES 2.0",Toast.LENGTH_LONG).show();
+            //return;
+        }
+    }
+    private boolean isProbablyEmulator() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1
+                && (Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86"));
     }
 }
