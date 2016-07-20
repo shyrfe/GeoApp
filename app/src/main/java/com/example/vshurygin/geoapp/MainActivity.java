@@ -65,6 +65,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity {
 
+    static {System.loadLibrary("OpenGLObjectModel");}
+    public native String getMsgFromJni();
+
     public static GoogleMap sGoogleMap;
 
     final private int UPDATE_MARKERS_TIME = 2000;
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         createMapView();
+        Log.d("Native",getMsgFromJni());
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mMarkersDelaySpeedSeekBar = (SeekBar)findViewById(R.id.markersDelaySpeedSeekBar);
         mMarkersDelaySpeedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
