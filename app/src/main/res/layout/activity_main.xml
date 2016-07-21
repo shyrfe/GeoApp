@@ -75,9 +75,9 @@
         android:layout_alignTop="@+id/CommentButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/seekBar"
+        android:layout_toStartOf="@+id/markersDelaySpeedSeekBar"
         android:maxWidth="50dp"
-        android:layout_above="@+id/seekBar"
+        android:layout_above="@+id/markersDelaySpeedSeekBar"
         android:layout_alignRight="@+id/markersDelaySpeedSeekBar"
         android:layout_alignEnd="@+id/markersDelaySpeedSeekBar" />
 
@@ -103,5 +103,15 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:max="5" />
+
+    <LinearLayout
+        android:id="@+id/GLlayout"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/StatusView"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/CommentButton"
+        android:layout_alignParentEnd="true"></LinearLayout>
 
 </RelativeLayout>
