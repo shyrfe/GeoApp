@@ -3,6 +3,7 @@
  */
 package com.example.vshurygin.geoapp;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import static android.opengl.GLES20.*;
@@ -22,11 +23,14 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
     static {System.loadLibrary("OpenGLObjectModel");}
 
+    private final Context context;
+
     public static native void on_surface_created();
     public static native void on_surface_changed(int width, int height);
     public static native void on_draw_frame();
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private float[] mModelMatrix = new float[16];
+    /*private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
     private float[] mMVPMatrix = new float[16];
@@ -44,8 +48,9 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     private final int mPositionOffset = 0;
     private final int mPositionDataSize = 3;
     private final int mColorOffset = 3;
-    private final int mColorDataSize = 4;
+    private final int mColorDataSize = 4;*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 final float[] triangle1VerticesData = {
         // X, Y, Z,
         // R, G, B, A
@@ -85,13 +90,15 @@ final float[] triangle1VerticesData = {
             0.0f, 0.0f, 0.0f, 1.0f};
 
 
-
+*/
+    public SurfaceRendererWrapper (Context context)
+    {this.context = context;}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
     {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Initialize the buffers.
+       /* // Initialize the buffers.
         mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangle2Vertices = ByteBuffer.allocateDirect(triangle2VerticesData.length * mBytesPerFloat)
@@ -101,9 +108,9 @@ final float[] triangle1VerticesData = {
 
         mTriangle1Vertices.put(triangle1VerticesData).position(0);
         mTriangle2Vertices.put(triangle2VerticesData).position(0);
-        mTriangle3Vertices.put(triangle3VerticesData).position(0);
+        mTriangle3Vertices.put(triangle3VerticesData).position(0);*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
         final float eyeX = 0.0f;
@@ -209,7 +216,7 @@ final float[] triangle1VerticesData = {
         mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
         mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
         mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
-        GLES20.glUseProgram(programHandle);
+        GLES20.glUseProgram(programHandle);*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
         gl.glShadeModel(GL10.GL_SMOOTH);
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
@@ -223,7 +230,7 @@ final float[] triangle1VerticesData = {
     public void onSurfaceChanged(GL10 gl, int width, int height)
     {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        GLES20.glViewport(0, 0, width, height);
+       /* GLES20.glViewport(0, 0, width, height);
         final float ratio = (float) width / height;
         final float left = -ratio;
         final float right = ratio;
@@ -231,7 +238,7 @@ final float[] triangle1VerticesData = {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
         on_surface_changed(width,height);
     }
@@ -243,7 +250,7 @@ final float[] triangle1VerticesData = {
         on_draw_frame();
         gl.glLoadIdentity();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        long time = SystemClock.uptimeMillis() % 10000L;
+       /* long time = SystemClock.uptimeMillis() % 10000L;
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
@@ -257,10 +264,10 @@ final float[] triangle1VerticesData = {
         Matrix.translateM(mModelMatrix, 0, 1.0f, 0.0f, 0.0f);
         Matrix.rotateM(mModelMatrix, 0, 90.0f, 0.0f, 1.0f, 0.0f);
         Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        drawTriangle(mTriangle3Vertices);
+        drawTriangle(mTriangle3Vertices);*/
     }
 
-    private void drawTriangle(final FloatBuffer aTriangleBuffer)
+   /* private void drawTriangle(final FloatBuffer aTriangleBuffer)
     {
         aTriangleBuffer.position(mPositionOffset);
         GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false,
@@ -274,5 +281,5 @@ final float[] triangle1VerticesData = {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-    }
+    }*/
 }
