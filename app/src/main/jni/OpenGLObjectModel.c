@@ -1,61 +1,60 @@
 #include "OpenGLObjectModel.h"
 
+JNIEXPORT jstring JNICALL
+Java_com_example_vshurygin_geoapp_MainActivity_getMsgFromJni(JNIEnv *env, jobject instance)
+{
+    //glClearColor(1.0f,0.0f,0.0f,0.0f);
+    return (*env)->NewStringUTF(env, "HelloJNI");
+}
 
-GLuint  LoadShader(const char* shaderSrc, GLenum type)
+static const GLfloat G_vertex_buffer_data[] = {
+        -0.5f, -0.2f,
+        0.0f, 0.2f,
+        0.5f,  -0.2f,
+};
+
+GLuint vertexbuffer;
+GLuint programID;
+
+GLuint  LoadShader(GLenum type,const char* shaderSrc)
 {
     GLuint shader;
     GLint compiled;
 
-    shader = glCreateShader(type);//создаём объект шейдера
+    shader = glCreateShader(type);
 
     if (shader == 0)
     {
         return 0;
     }
 
-    glShaderSource(shader,1,&shaderSrc,NULL);// выгружаем в шейдер shaderSrc
-    glCompileShader(shader);//компилим это барахло
-    glGetShaderiv(shader, GL_COMPILE_STATUS,&compiled);//проверяем compile status
+    glShaderSource(shader,1,&shaderSrc,NULL);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS,&compiled);
     if(!compiled)
     {
         GLint infoLen = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-
-        if(infoLen > 1 )
-        {
-            char* infoLog = malloc(sizeof(char) * infoLen);
-            glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-            //esLogMessage("Error compiling shader: \n%s\n", infoLog);
-            free(infoLog);
-        }
         glDeleteShader(shader);
         return 0;
     }
     return shader;
-
 }
 
-
-void onSurfaceCreated()
+GLuint LoadShaders()
 {
-    glClearColor(1.0f,1.0f,1.0f,0.5f);
-    //glClearColor(0f, 0f, 0f, 0f);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    GLuint programObject;
 
-    GLbyte vShaderStr[] =
-            "attribute vec4 vPosition; \n"
-            "void main()               \n"
-            "{                         \n"
-            "  gl_Position = vPosition;\n"
-            "}                         \n";
+    GLbyte fShaderStr[] = "precision mediump float;"
+            "uniform vec4 u_Color;"
+            "void main(){"
+            "    gl_FragColor = u_Color;"
+            "}";
 
-    GLbyte fShaderStr[] =
-            "precision mediump float;                   \n"
-            "void main()                                \n"
-            "{                                          \n"
-            "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
-            "}                                          \n";
+    GLbyte vShaderStr[] = "attribute vec4 a_Position;"
+            "void main(){"
+            "    gl_Position = a_Position;"
+            " }";
 
     GLuint vertexShader;
     GLuint fragmentShader;
@@ -72,52 +71,45 @@ void onSurfaceCreated()
 
     glBindAttribLocation(programObject, 0 ,"vPosition");
     glLinkProgram(programObject);
-
-
-
+    return programObject;
 }
 
+void onSurfaceCreated()
+{
+    glClearColor(0,0,0,0);
+    programID = LoadShaders();
+    glUseProgram(programID);
+    int uColorLocation = glGetUniformLocation(programID,"u_Color");
+    glUniform4f(uColorLocation,0.0f,0.0f,1.0f,1.0f);
+    int aPositionLocation = glGetAttribLocation(programID, "a_Position");
+    glVertexAttribPointer(aPositionLocation,2,GL_FLOAT,GL_FALSE,0,G_vertex_buffer_data);//возможны проблеммы с G_vertex_buffer_data
+    glEnableVertexAttribArray(aPositionLocation);
+}
 void onSurfaceChanged(int width, int height)
 {
-
+    glViewport(0,0,width,height);
 }
-
 void onDrawFrame()
 {
-    //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glClearColor(0.0f,0.0f,0.0f,0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(programObject);
-    glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 0, mTriangleVertices);
-    glEnableVertexAttribArray(0);
-    glDrawArrays(GL_TRIANGLES,0,3);
-
-}
-
-
-JNIEXPORT jstring JNICALL
-Java_com_example_vshurygin_geoapp_MainActivity_getMsgFromJni(JNIEnv *env, jobject instance)
-{
-    //glClearColor(1.0f,0.0f,0.0f,0.0f);
-    return (*env)->NewStringUTF(env, "HelloJNI");
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_on_1surface_1created(JNIEnv *env, jobject instance)
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceCreated(JNIEnv *env, jclass type)
 {
     onSurfaceCreated();
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_on_1surface_1changed(JNIEnv *env, jobject instance, jint width, jint height)
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceChanged(JNIEnv *env, jclass type,
+                                                                         jint width, jint height)
 {
     onSurfaceChanged(width,height);
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_on_1draw_1frame(JNIEnv *env, jobject instance)
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mDrawframe(JNIEnv *env, jclass type)
 {
     onDrawFrame();
 }
-
