@@ -14,6 +14,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Surface;
 
 import java.nio.ByteBuffer;
@@ -27,15 +28,13 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
     private final Context context;
 
-    /*public static native void nativeOnStart();
-    public static native void nativeOnResume();
-    public static native void nativeOnPause();
-    public static native void nativeOnStop();
-    public static native void nativeSetSurface(Surface surface);*/
-
-    public static native void mSurfaceCreated();
-    public static native void mSurfaceChanged(int width, int height);
+    public static native void mSurfaceCreated(SurfaceRendererWrapper surfaceRendererWrapper);
+    public static native void mSurfaceChanged(SurfaceRendererWrapper surfaceRendererWrapper,int width, int height);
     public static native void mDrawframe();
+
+    private float[] mProjectionMatrix = new float[16];
+    private float[] mViewMatrix = new float[16];
+    float[] mMatrix = new float[16];
 
 
     public SurfaceRendererWrapper (Context context)
@@ -44,7 +43,6 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
     {
-        //gl.glClearColor(1,1,1,0.5f);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
        /* gl.glDisable(GL10.GL_DITHER);
         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
@@ -53,13 +51,13 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         gl.glShadeModel(GL10.GL_SMOOTH);
         gl.glEnable(GL10.GL_DEPTH_TEST);*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        mSurfaceCreated();
+        mSurfaceCreated(this);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height)
     {
-        mSurfaceChanged(width,height);
+        mSurfaceChanged(this,width,height);
     }
 
     @Override
@@ -73,5 +71,64 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
         //gl.glLoadIdentity();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
+    public float[] mFrustum()
+    {
+        float left = -1.0f;
+        float right = 1.0f;
+        float bottom = -1.0f;
+        float top = 1.0f;
+        float near = 2.0f;
+        float far = 8.0f;
+        float ratio = 1;
+
+
+        float[] m = new float[16];
+
+        Matrix.frustumM(m,0,left,right,bottom,top,near,far);
+        return m;
+    }
+    public float[] createViewMatrix() {
+        // точка положения камеры
+        float eyeX = 0;
+        float eyeY = 0;
+        float eyeZ = 1;
+
+        // точка направления камеры
+        float centerX = 0;
+        float centerY = 0;
+        float centerZ = 0;
+
+        // up-вектор
+        float upX = 0;
+        float upY = 1;
+        float upZ = 0;
+        float[] mViewMatrix = new float[16];
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+        return mViewMatrix;
+    }
+    public void setProjectionMatrix(float[] pM)
+    {
+        if (pM != null)
+        {
+            Log.d("setProjectionMatrix","OK");
+        }
+        mProjectionMatrix = pM;
+    }
+    public void setViewMatrix(float[] vM)
+    {
+        if (vM != null)
+        {
+            Log.d("setViewMatrix","OK");
+        }
+        mViewMatrix = vM;
+    }
+    public float[] MultiplyProjectionMatrixAndViewMatrix()
+    {
+        if ((mProjectionMatrix != null)&& (mViewMatrix != null))
+        {
+            Matrix.multiplyMM(mMatrix,0,mProjectionMatrix,0,mViewMatrix,0);
+        }
+        return mMatrix;
     }
 }

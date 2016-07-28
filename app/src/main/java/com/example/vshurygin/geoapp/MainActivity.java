@@ -355,10 +355,6 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout linearLayout = (LinearLayout) findViewById(R.id.GLlayout);
             mGlSurfaceView = new GLSurfaceView(MainActivity.this);
 
-            /*if (isProbablyEmulator())
-            {
-                mGlSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
-            }*/
             mGlSurfaceView.setZOrderOnTop(true);
             mGlSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
             mGlSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
@@ -369,12 +365,7 @@ public class MainActivity extends AppCompatActivity {
             rendererSet = true;
 
             linearLayout.addView(mGlSurfaceView,0);
-            //FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
 
-            //FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(100,100);
-            //addContentView(mGlSurfaceView,layoutParams);
-
-            //setContentView(mGlSurfaceView);
         }
         else
         {

@@ -23,6 +23,7 @@ model {
         ndk {
             moduleName "OpenGLObjectModel"
             ldLibs.add("GLESv2")
+            ldLibs.add("log")
         }
 
     }
