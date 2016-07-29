@@ -174,7 +174,7 @@ void createProjectionMatrix(int width, int height)
 
 void onSurfaceCreated()
 {
-    glClearColor(0,0,0,0.5);
+    glClearColor(0,0,0,0);
     glEnable(GL_DEPTH_TEST);
     programID = LoadProgramFromShaders();
     glUseProgram(programID);
@@ -198,6 +198,9 @@ void onDrawFrame()
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glUniform4f(uColorLocation,1.0f,0.0f,0.0f,1.0f);
     glDrawArrays(GL_TRIANGLES,3,6);*/
+    createViewMatrix();
+    bindMatrix();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // треугольники
@@ -206,12 +209,15 @@ void onDrawFrame()
 
     glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 3, 3);
+    //glDrawArrays(GL_TRIANGLES,3,6);
 
     glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 6, 3);
+    //glDrawArrays(GL_TRIANGLES,6,9);
 
     glUniform4f(uColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 9, 3);
+    //glDrawArrays(GL_TRIANGLES,9,12);
 
     // оси
     glLineWidth(1);
@@ -244,8 +250,12 @@ Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceChanged(JNIEnv 
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mDrawframe(JNIEnv *env, jclass type)
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mDrawframe(JNIEnv *env, jclass type,jobject surfaceRendererWrapper)
 {
+    pJNIenv = env;
+    pSurfaceRendererWrapper = surfaceRendererWrapper;
+    pSurfaceRendererWrapperClass = (*pJNIenv)->GetObjectClass(pJNIenv,pSurfaceRendererWrapper);
+
     onDrawFrame();
 }
 

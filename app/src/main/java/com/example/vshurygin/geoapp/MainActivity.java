@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
             mGlSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
             mGlSurfaceView.setEGLContextClientVersion(2);
             mGlSurfaceView.setRenderer(new SurfaceRendererWrapper(MainActivity.this));
-            mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            //mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
             rendererSet = true;
 

@@ -30,7 +30,7 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
     public static native void mSurfaceCreated(SurfaceRendererWrapper surfaceRendererWrapper);
     public static native void mSurfaceChanged(SurfaceRendererWrapper surfaceRendererWrapper,int width, int height);
-    public static native void mDrawframe();
+    public static native void mDrawframe(SurfaceRendererWrapper surfaceRendererWrapper);
 
     private float[] mProjectionMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
@@ -64,7 +64,7 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl)
     {
 
-        mDrawframe();
+        mDrawframe(this);
         //drawframe();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //on_draw_frame();
@@ -88,11 +88,15 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         Matrix.frustumM(m,0,left,right,bottom,top,near,far);
         return m;
     }
+
     public float[] createViewMatrix() {
+        float time = (float)(SystemClock.uptimeMillis()%1000)/1000;
+        float angle = time *2 * (float)Math.PI;
+
         // точка положения камеры
-        float eyeX = 0;
+        float eyeX = (float) (Math.cos(angle) * 2f);
         float eyeY = 0;
-        float eyeZ = 1;
+        float eyeZ = (float) (Math.sin(angle) * 2f);
 
         // точка направления камеры
         float centerX = 0;
@@ -109,17 +113,17 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     }
     public void setProjectionMatrix(float[] pM)
     {
-        if (pM != null)
+        if (pM == null)
         {
-            Log.d("setProjectionMatrix","OK");
+            Log.d("setProjectionMatrix","matrix is empty");
         }
         mProjectionMatrix = pM;
     }
     public void setViewMatrix(float[] vM)
     {
-        if (vM != null)
+        if (vM == null)
         {
-            Log.d("setViewMatrix","OK");
+            Log.d("setViewMatrix","matrix is empty");
         }
         mViewMatrix = vM;
     }
