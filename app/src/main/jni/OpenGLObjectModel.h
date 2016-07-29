@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <jni.h>
+#include <math.h>
 #include <android/log.h>
 
 #include "ShaderUtils.h"
@@ -51,7 +52,8 @@ static GLuint programID;
 #define VERTEX_S 0.4f
 #define VERTEX_D 0.9f
 #define VERTEX_L 3.0f
-static const GLfloat G_vertex_buffer_data[] = {
+#define VERTEX_X 2
+/*static const GLfloat G_vertex_buffer_data[] = {
 
         -2*VERTEX_S, -VERTEX_S, VERTEX_D,
         2*VERTEX_S, -VERTEX_S, VERTEX_D,
@@ -72,17 +74,17 @@ static const GLfloat G_vertex_buffer_data[] = {
         -VERTEX_D, -VERTEX_S, 2*VERTEX_S,
         -VERTEX_D, VERTEX_S, 0,
 
-        // ось X
-        -VERTEX_L, 0,0,
-        VERTEX_L,0,0,
+};*/
+#define VERTEX_BUFFER_SIZE 18
+static GLfloat G_vertex_buffer_data[] = {
 
-        // ось Y
-        0,-VERTEX_L,0,
-        0,VERTEX_L,0,
+        -2.0f,2.0f,0,
+        -1.5f,2.0f,0,
+        -1.5f,1.5f,0,
 
-        // ось Z
-        0,0,-VERTEX_L,
-        0,0,VERTEX_L
+        -2.0f,1.5f,0,
+        -2.0f,2.0f,0,
+        -1.5f,1.5f,0
 };
 
 void onSurfaceCreated();

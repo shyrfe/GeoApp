@@ -1,8 +1,35 @@
 #include "OpenGLObjectModel.h"
 
+void rotateVertexBufferCubeX(float A)
+{
+    //переделать в локальные координаты объекта!!!!
+    int i = 0;
+    A = A * M_PI/180;
+        float m[9];
+    m[0] = G_vertex_buffer_data[0] * 1 + G_vertex_buffer_data[1] * 0 + G_vertex_buffer_data[2] * 0;
+    m[1] = G_vertex_buffer_data[0] * 0 + G_vertex_buffer_data[1] * cosf(A) + G_vertex_buffer_data[2] * sinf(A);
+    m[2] = G_vertex_buffer_data[0] * 0 + G_vertex_buffer_data[1] * (-1*sinf(A)) + G_vertex_buffer_data[2] * cosf(A);
+
+    m[3] = G_vertex_buffer_data[3] * 1 + G_vertex_buffer_data[4] * 0 + G_vertex_buffer_data[5] * 0;
+    m[4] = G_vertex_buffer_data[3] * 0 + G_vertex_buffer_data[4] * cosf(A) + G_vertex_buffer_data[5] * sinf(A);
+    m[5] = G_vertex_buffer_data[3] * 0 + G_vertex_buffer_data[4] * (-1*sinf(A)) + G_vertex_buffer_data[5] * cosf(A);
+
+    m[6] = G_vertex_buffer_data[6] * 1 + G_vertex_buffer_data[7] * 0 + G_vertex_buffer_data[8] * 0;
+    m[7] = G_vertex_buffer_data[6] * 0 + G_vertex_buffer_data[7] * cosf(A) + G_vertex_buffer_data[8] * sinf(A);
+    m[8] = G_vertex_buffer_data[6] * 0 + G_vertex_buffer_data[7] * (-1*sinf(A)) + G_vertex_buffer_data[8] * cosf(A);
+
+    while (i < 9)
+    {
+        G_vertex_buffer_data[i] = m[i];
+        i++;
+    }
+    i=0;
+    //ALOG("%f",G_vertex_buffer_data[i]);
+
+    //glVertexAttribPointer(aPositionLocation,POSITION_COUNT,GL_FLOAT,GL_FALSE,0,G_vertex_buffer_data);
+}
 void createViewMatrix()
 {
-
     jmethodID method = (*pJNIenv)->GetMethodID(pJNIenv,pSurfaceRendererWrapperClass,"createViewMatrix","()[F");
 
     jfloatArray ViewMatrix = (jfloatArray)(*pJNIenv)->CallObjectMethod(pJNIenv,pSurfaceRendererWrapper,method);
@@ -190,6 +217,7 @@ void onSurfaceChanged(int width, int height)
     glViewport(0,0,width,height);
     createProjectionMatrix(width,height);
     bindMatrix();
+
 }
 
 void onDrawFrame()
@@ -200,7 +228,7 @@ void onDrawFrame()
     glDrawArrays(GL_TRIANGLES,3,6);*/
     createViewMatrix();
     bindMatrix();
-
+    rotateVertexBufferCubeX(10);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // треугольники
@@ -211,25 +239,14 @@ void onDrawFrame()
     glDrawArrays(GL_TRIANGLES, 3, 3);
     //glDrawArrays(GL_TRIANGLES,3,6);
 
-    glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+    /*glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 6, 3);
     //glDrawArrays(GL_TRIANGLES,6,9);
 
     glUniform4f(uColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 9, 3);
+    glDrawArrays(GL_TRIANGLES, 9, 3);*/
     //glDrawArrays(GL_TRIANGLES,9,12);
 
-    // оси
-    glLineWidth(1);
-
-    glUniform4f(uColorLocation, 0.0f, 1.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_LINES, 12, 2);
-
-    glUniform4f(uColorLocation, 1.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_LINES, 14, 2);
-
-    glUniform4f(uColorLocation, 1.0f, 0.5f, 0.0f, 1.0f);
-    glDrawArrays(GL_LINES, 16, 2);
 }
 
 /*JNIEXPORT void JNICALL

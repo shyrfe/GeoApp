@@ -63,12 +63,10 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl)
     {
-
         mDrawframe(this);
         //drawframe();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //on_draw_frame();
-
         //gl.glLoadIdentity();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -94,12 +92,12 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         float angle = time *2 * (float)Math.PI;
 
         // точка положения камеры
-        float eyeX = (float) (Math.cos(angle) * 2f);
+        float eyeX = 0;//(float) (Math.cos(angle) * 2f);
         float eyeY = 0;
-        float eyeZ = (float) (Math.sin(angle) * 2f);
+        float eyeZ = 1;//(float) (Math.sin(angle) * 2f);
 
         // точка направления камеры
-        float centerX = 0;
+        float centerX = 0;  //(float) (Math.cos(angle) * 2f);
         float centerY = 0;
         float centerZ = 0;
 
@@ -107,7 +105,9 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         float upX = 0;
         float upY = 1;
         float upZ = 0;
+
         float[] mViewMatrix = new float[16];
+
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
         return mViewMatrix;
     }
