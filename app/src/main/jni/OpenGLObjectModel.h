@@ -75,8 +75,9 @@ static GLuint programID;
         -VERTEX_D, VERTEX_S, 0,
 
 };*/
-#define VERTEX_BUFFER_SIZE 18
-static GLfloat G_vertex_buffer_data[] = {
+#define GLOBAL_VERTEX_BUFFER_SIZE 72
+static GLfloat G_vertex_buffer_data[GLOBAL_VERTEX_BUFFER_SIZE];
+/*static GLfloat G_vertex_buffer_data[] = {
 
         -2.0f,2.0f,0,
         -1.5f,2.0f,0,
@@ -85,7 +86,55 @@ static GLfloat G_vertex_buffer_data[] = {
         -2.0f,1.5f,0,
         -2.0f,2.0f,0,
         -1.5f,1.5f,0
+};*/
+
+//float cubePositon[3] = {-1.5f,1.5f,0};
+float cubePositon[3] = {-0.5f,0.5f,0};
+#define LOCAL_CUBE_VERTICES_BUFFER_SIZE 72
+float localCubeVertices[] = {
+        //triangle 1
+        -0.15f,-0.15f,0.15f,
+        -0.15f,0.15f,0.15f,
+        0.15f,-0.15f,0.15f,
+        //triangle 2
+
+        -0.15f,0.15f,0.15f,
+        0.15f,0.15f,0.15f,
+        0.15f,-0.15f,0.15,
+        //triangle 3
+
+        -0.15f,-0.15f,-0.15f,
+        -0.15f,0.15f,-0.15f,
+        0.15f,-0.15f,-0.15f,
+        //triangle 4
+
+        -0.15f,0.15f,-0.15f,
+        0.15f,0.15f,-0.15f,
+        0.15f,-0.15f,-0.15,
+
+        //triangle 5
+        -0.15f,0.15f,-0.15f,
+        -0.15f,0.15f,0.15f,
+        -0.15f,-0.15f,0.15f,
+
+        //triangle 6
+        -0.15f,0.15f,-0.15f,
+        -0.15f,-0.15f,0.15f,
+        -0.15f,-0.15f,-0.15f,
+
+        //triangle 7
+        0.15f,0.15f,-0.15f,
+        0.15f,0.15f,0.15f,
+        0.15f,-0.15f,0.15f,
+
+        //triangle 8
+        0.15f,0.15f,-0.15f,
+        0.15f,-0.15f,0.15f,
+        0.15f,-0.15f,-0.15f,
+
 };
+
+
 
 void onSurfaceCreated();
 void onSurfaceChanged(int width, int height);

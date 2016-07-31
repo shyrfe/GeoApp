@@ -1,81 +1,55 @@
 #include "OpenGLObjectModel.h"
+void prepareData(){
+
+    int i = 0;
+    int j = 0;
+
+    if (GLOBAL_VERTEX_BUFFER_SIZE >= LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    {
+        while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+        {
+            if (j == 3)
+            {j = 0;}
+            G_vertex_buffer_data[i] = localCubeVertices[i] + cubePositon[j];
+            i++;
+            j++;
+        }
+
+    }
+}
 
 void rotateVertexBufferCubeX(float A)
 {
-    //переделать в локальные координаты объекта!!!!
     int i = 0;
     A = A * M_PI/180;
-        float m[9];
-    m[0] = G_vertex_buffer_data[0] * 1 + G_vertex_buffer_data[1] * 0 + G_vertex_buffer_data[2] * 0;
-    m[1] = G_vertex_buffer_data[0] * 0 + G_vertex_buffer_data[1] * cosf(A) + G_vertex_buffer_data[2] * sinf(A);
-    m[2] = G_vertex_buffer_data[0] * 0 + G_vertex_buffer_data[1] * (-1*sinf(A)) + G_vertex_buffer_data[2] * cosf(A);
 
-    m[3] = G_vertex_buffer_data[3] * 1 + G_vertex_buffer_data[4] * 0 + G_vertex_buffer_data[5] * 0;
-    m[4] = G_vertex_buffer_data[3] * 0 + G_vertex_buffer_data[4] * cosf(A) + G_vertex_buffer_data[5] * sinf(A);
-    m[5] = G_vertex_buffer_data[3] * 0 + G_vertex_buffer_data[4] * (-1*sinf(A)) + G_vertex_buffer_data[5] * cosf(A);
-
-    m[6] = G_vertex_buffer_data[6] * 1 + G_vertex_buffer_data[7] * 0 + G_vertex_buffer_data[8] * 0;
-    m[7] = G_vertex_buffer_data[6] * 0 + G_vertex_buffer_data[7] * cosf(A) + G_vertex_buffer_data[8] * sinf(A);
-    m[8] = G_vertex_buffer_data[6] * 0 + G_vertex_buffer_data[7] * (-1*sinf(A)) + G_vertex_buffer_data[8] * cosf(A);
-
-    while (i < 9)
+    float m[LOCAL_CUBE_VERTICES_BUFFER_SIZE];
+    while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
     {
-        G_vertex_buffer_data[i] = m[i];
+        m[i] = localCubeVertices[i] * 1 + localCubeVertices[i+1] * 0 + localCubeVertices[i+2] * 0;
+        m[i+1] = localCubeVertices[i] * 0 + localCubeVertices[i+1] * cosf(A) + localCubeVertices[i+2] * sinf(A);
+        m[i+2] = localCubeVertices[i] * 0 + localCubeVertices[i+1] * (-1*sinf(A)) + localCubeVertices[i+2] * cosf(A);
+        i += 3;
+    }
+
+    i=0;
+    while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    {
+        localCubeVertices[i] = m[i];
         i++;
     }
     i=0;
-    //ALOG("%f",G_vertex_buffer_data[i]);
-
-    //glVertexAttribPointer(aPositionLocation,POSITION_COUNT,GL_FLOAT,GL_FALSE,0,G_vertex_buffer_data);
+    prepareData();
 }
+
 void createViewMatrix()
 {
     jmethodID method = (*pJNIenv)->GetMethodID(pJNIenv,pSurfaceRendererWrapperClass,"createViewMatrix","()[F");
 
     jfloatArray ViewMatrix = (jfloatArray)(*pJNIenv)->CallObjectMethod(pJNIenv,pSurfaceRendererWrapper,method);
     mViewMatrix = (*pJNIenv)->GetFloatArrayElements(pJNIenv,ViewMatrix,NULL);
-    //ALOG("%f",mViewMatrix[0]);
 }
-void prepareData(){
-    float s = 0.4f;
-    float d = 0.9f;
-    float l = 3;
 
-    float vertices[] = {
-
-            // первый треугольник
-            -2*s, -s, d,
-            2*s, -s, d,
-            0, s, d,
-
-            // второй треугольник
-            -2*s, -s, -d,
-            2*s, -s, -d,
-            0, s, -d,
-
-            // третий треугольник
-            d, -s, -2*s,
-            d, -s, 2*s,
-            d, s, 0,
-
-            // четвертый треугольник
-            -d, -s, -2*s,
-            -d, -s, 2*s,
-            -d, s, 0,
-
-            // ось X
-            -l, 0,0,
-            l,0,0,
-
-            // ось Y
-            0,-l,0,
-            0,l,0,
-
-            // ось Z
-            0,0,-l,
-            0,0,l,
-    };
-}
 void bindData()
 {
     aPositionLocation = glGetAttribLocation(programID, "a_Position");
@@ -87,6 +61,7 @@ void bindData()
 
     uMatrixLocation = glGetUniformLocation(programID, "u_Matrix");
 }
+
 void MultiplyProjectionMatrixAndViewMatrix(float* projectionMatrix,float* ViewMatrix, float* result)
 {
     const int STEP = 4;
@@ -98,6 +73,7 @@ void MultiplyProjectionMatrixAndViewMatrix(float* projectionMatrix,float* ViewMa
                 result[i*STEP+j] += projectionMatrix[i*STEP+k] * ViewMatrix[k*STEP+j];
         }*/
 }
+
 void bindMatrix()
 {
     //jclass class = (*pJNIenv)->GetObjectClass(pJNIenv,pSurfaceRendererWrapper);//(*pJNIenv)->FindClass(pJNIenv,"SurfaceRendererWrapper");
@@ -117,10 +93,6 @@ void bindMatrix()
     method = (*pJNIenv)->GetMethodID(pJNIenv,pSurfaceRendererWrapperClass,"MultiplyProjectionMatrixAndViewMatrix","()[F");
     jfloatArray MatrixArrayResult = (jfloatArray)(*pJNIenv)->CallObjectMethod(pJNIenv,pSurfaceRendererWrapper,method);
     mMatrix = (*pJNIenv)->GetFloatArrayElements(pJNIenv,MatrixArrayResult,NULL);
-
-    //mViewMatrix = (*pJNIenv)->GetFloatArrayElements(pJNIenv,ViewMatrix,NULL);
-
-    //MultiplyProjectionMatrixAndViewMatrix(mProjectionMatrix,mViewMatrix,mMatrix);
 
     glUniformMatrix4fv(uMatrixLocation,1,GL_FALSE,mMatrix);
 }
@@ -150,27 +122,6 @@ void frustum(float ProjectionMatrix[],float left, float right, float bottom, flo
     ProjectionMatrix[3*4+3]=0.0f;
 }
 
-/*void frustum(float mProjectionMatrix[],float left, float right, float bottom, float top, float near, float far)
-{
-    float r_width  = 1.0f / (right - left);
-    float r_height = 1.0f / (top - bottom);
-    float r_depth  = 1.0f / (near - far);
-    float x = 2.0f * (near * r_width);
-    float y = 2.0f * (near * r_height);
-    float A = 2.0f * ((right+left) * r_width);
-    float B = (top + bottom) * r_height;
-    float C = (far + near) * r_depth;
-    float D = 2.0f * (far * near * r_depth);
-
-    //memset((void*)m, 0, 16*sizeof(float));
-    mProjectionMatrix[ 0] = x;
-    mProjectionMatrix[ 5] = y;
-    mProjectionMatrix[ 8] = A;
-    mProjectionMatrix[ 9] = B;
-    mProjectionMatrix[10] = C;
-    mProjectionMatrix[14] = D;
-    mProjectionMatrix[11] = -1.0f;
-}*/
 
 void createProjectionMatrix(int width, int height)
 {
@@ -209,7 +160,6 @@ void onSurfaceCreated()
     createViewMatrix();
     prepareData();
     bindData();
-
 }
 
 void onSurfaceChanged(int width, int height)
@@ -217,44 +167,32 @@ void onSurfaceChanged(int width, int height)
     glViewport(0,0,width,height);
     createProjectionMatrix(width,height);
     bindMatrix();
-
 }
 
 void onDrawFrame()
 {
-    /*glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glUniform4f(uColorLocation,1.0f,0.0f,0.0f,1.0f);
-    glDrawArrays(GL_TRIANGLES,3,6);*/
-    createViewMatrix();
+    //createViewMatrix();
     bindMatrix();
-    rotateVertexBufferCubeX(10);
+    rotateVertexBufferCubeX(2);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // треугольники
-    glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+    glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 3, 3);
+
+    glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 6, 3);
+    glDrawArrays(GL_TRIANGLES, 9, 3);
 
     glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 3, 3);
-    //glDrawArrays(GL_TRIANGLES,3,6);
-
-    /*glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 6, 3);
-    //glDrawArrays(GL_TRIANGLES,6,9);
+    glDrawArrays(GL_TRIANGLES, 12, 3);
+    glDrawArrays(GL_TRIANGLES, 15, 3);
 
     glUniform4f(uColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 9, 3);*/
-    //glDrawArrays(GL_TRIANGLES,9,12);
-
+    glDrawArrays(GL_TRIANGLES, 18, 3);
+    glDrawArrays(GL_TRIANGLES, 21, 3);
 }
-
-/*JNIEXPORT void JNICALL
-Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceCreated(JNIEnv *env, jclass type)
-{
-
-    onSurfaceCreated();
-}*/
 
 JNIEXPORT void JNICALL
 Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceChanged(JNIEnv *env, jclass type,jobject surfaceRendererWrapper,
