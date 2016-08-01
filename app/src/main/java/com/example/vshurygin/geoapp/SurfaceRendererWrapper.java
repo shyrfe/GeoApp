@@ -28,14 +28,17 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
     private final Context context;
 
-    public static native void mSurfaceCreated(SurfaceRendererWrapper surfaceRendererWrapper);
-    public static native void mSurfaceChanged(SurfaceRendererWrapper surfaceRendererWrapper,int width, int height);
-    public static native void mDrawframe(SurfaceRendererWrapper surfaceRendererWrapper);
+    static native void mSurfaceCreated(SurfaceRendererWrapper surfaceRendererWrapper);
+    static native void mSurfaceChanged(SurfaceRendererWrapper surfaceRendererWrapper,int width, int height);
+    static native void mDrawframe(SurfaceRendererWrapper surfaceRendererWrapper);
+    static native void addObject(float _x, float _y);
+
+    private int mWidth;
+    private int mHeight;
 
     private float[] mProjectionMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     float[] mMatrix = new float[16];
-
 
     public SurfaceRendererWrapper (Context context)
     {this.context = context;}
@@ -43,33 +46,33 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
     {
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-       /* gl.glDisable(GL10.GL_DITHER);
-        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
-        gl.glClearColor(0,0,0,0);
-        gl.glEnable(GL10.GL_CULL_FACE);
-        gl.glShadeModel(GL10.GL_SMOOTH);
-        gl.glEnable(GL10.GL_DEPTH_TEST);*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
         mSurfaceCreated(this);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height)
     {
+        mWidth = width;
+        mHeight = height;
+
         mSurfaceChanged(this,width,height);
     }
-
     @Override
     public void onDrawFrame(GL10 gl)
     {
         mDrawframe(this);
-        //drawframe();
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //on_draw_frame();
-        //gl.glLoadIdentity();
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
+
+    public void add3DMarker(int _x, int _y)
+    {
+        if ((mWidth != 0) && (mHeight != 0))
+        {
+            float x  = (1.0f-((float)_x/((float)mWidth/2.0f)))*(-1.0f);
+            float y = (1.0f-((float)_y/((float)mHeight/2.0f)));//(float)_y/(mHeight/2);
+            addObject(x,y);
+        }
+    }
+// C function Wrappers
     public float[] mFrustum()
     {
         float left = -1.0f;
@@ -80,13 +83,17 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         float far = 8.0f;
         float ratio = 1;
 
-
         float[] m = new float[16];
 
         Matrix.frustumM(m,0,left,right,bottom,top,near,far);
         return m;
     }
-
+    public float[] createProjectionMatrix(float[] val)
+    {
+        float[] matrix = new float[16];
+        Matrix.orthoM(matrix,0,val[0],val[1],val[2],val[3],val[4],val[5]);
+        return matrix;
+    }
     public float[] createViewMatrix() {
         float time = (float)(SystemClock.uptimeMillis()%1000)/1000;
         float angle = time *2 * (float)Math.PI;
@@ -135,4 +142,5 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         }
         return mMatrix;
     }
+////////////////////////
 }

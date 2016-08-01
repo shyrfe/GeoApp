@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.nfc.Tag;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
@@ -45,7 +46,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -91,11 +94,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText mCommentBar;
     private SeekBar mMarkersDelaySpeedSeekBar;
     private int mMarkersDelaySpeed = 0;
-    //private GoogleMap mGoogleMap;
 
     private GeoAppService mLocalGeoAppService;
     private boolean mIsServiceBind = false;
     private boolean mIsPlayDelayMarkersOn = false;
+
+    private SurfaceRendererWrapper mSurfaceRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -353,13 +357,16 @@ public class MainActivity extends AppCompatActivity {
         if (isSupportsEs2)
         {
             LinearLayout linearLayout = (LinearLayout) findViewById(R.id.GLlayout);
+
             mGlSurfaceView = new GLSurfaceView(MainActivity.this);
 
             mGlSurfaceView.setZOrderOnTop(true);
             mGlSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
             mGlSurfaceView.setEGLConfigChooser(8,8,8,8,16,0);
             mGlSurfaceView.setEGLContextClientVersion(2);
-            mGlSurfaceView.setRenderer(new SurfaceRendererWrapper(MainActivity.this));
+
+            mSurfaceRenderer = new SurfaceRendererWrapper(MainActivity.this);
+            mGlSurfaceView.setRenderer(mSurfaceRenderer);
             //mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
             rendererSet = true;

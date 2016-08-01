@@ -2,6 +2,7 @@ package com.example.vshurygin.geoapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +11,7 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -35,9 +37,7 @@ public class MapManipulation {
 
     private GoogleMap mGoogleMap;
     private RecordLog mRecordLog;
-    //private ArrayList<Record> mAllRecords;
-    //private ArrayList<Marker> mAllMarkers;
-    //private Vector<Marker> mAllMarkers;
+
     private  CopyOnWriteArrayList<Marker> mAllMarkers;
 
     private CopyOnWriteArrayList<Record> mAllRecords = new CopyOnWriteArrayList<Record>();
@@ -47,13 +47,15 @@ public class MapManipulation {
     {
         mGoogleMap = googleMap;
         mRecordLog = recordLog;
-        //mAllRecords = (ArrayList<Record>) mRecordLog.readAll();
         try
-        { mAllRecords.addAll(mRecordLog.readAll()); }
-        catch (Exception e){e.printStackTrace();}
+        {
+            mAllRecords.addAll(mRecordLog.readAll());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-        //mAllMarkers = new ArrayList<Marker>();
-        //mAllMarkers = new Vector<Marker>();
         mAllMarkers = new CopyOnWriteArrayList<>();
 
         try
@@ -79,7 +81,6 @@ public class MapManipulation {
             {
                 for(Record rec : mAllRecords)
                 {
-                    //Log.d("RECORDSADDALL",rec.toString());
                     Marker mrk = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(rec.getLatitude(),rec.getLongitude())).visible(false).title(rec.getComment()));
                     mAllMarkers.add(mrk);
                 }
@@ -87,6 +88,7 @@ public class MapManipulation {
         };
         mainHandler.post(myRunnable);
     }
+
     public void addRecord(final Record record)
     {
         mAllRecords.add(record);
@@ -102,6 +104,7 @@ public class MapManipulation {
         mainHandler.post(myRunnable);
 
     }
+
     public void removeAllMarkers()
     {
         for (Marker mrk : mAllMarkers)
@@ -114,7 +117,6 @@ public class MapManipulation {
             {
                 e.printStackTrace();
             }
-
         }
         mAllMarkers.clear();
     }
@@ -129,6 +131,7 @@ public class MapManipulation {
         speed = speed/mAllRecords.size();
         return speed;
     }
+
     public float getDistance()
     {
         float distance = 0;
@@ -140,10 +143,10 @@ public class MapManipulation {
                 Location.distanceBetween(mAllRecords.get(i).getLatitude(),mAllRecords.get(i).getLongitude(),mAllRecords.get(i+1).getLatitude(),mAllRecords.get(i+1).getLongitude(),d);
                 distance += d[0];
             }
-
         }
         return distance;
     }
+
     public void hideAllMarkers()
     {
         Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -158,11 +161,12 @@ public class MapManipulation {
             }
         };
         mainHandler.post(myRunnable);
-
     }
+
     public void showAllMarkers()
     {
         Handler mainHandler = new Handler(Looper.getMainLooper());
+
         Runnable myRunnable = new Runnable() {
             @Override
             public void run()
@@ -170,7 +174,14 @@ public class MapManipulation {
                 for (Marker mrk: mAllMarkers)
                 {
                     mrk.setVisible(true);
+
                 }
+/*                /////////test///////////
+                LatLng latLng = mAllMarkers.get(0).getPosition();
+                Projection projection = mGoogleMap.getProjection();
+                Point point = projection.toScreenLocation(latLng);
+                Log.d("Marker",point.toString());
+                ////////////////////////*/
             }
         };
         mainHandler.post(myRunnable);
@@ -181,12 +192,10 @@ public class MapManipulation {
         mShowMarkersWithDelayIsSkip = false;
         final Handler mainHandler = new Handler(Looper.getMainLooper());
         hideAllMarkers();
-        //showAllPolylines();
-        final PolylineOptions lineOnMap = new PolylineOptions();
 
+        final PolylineOptions lineOnMap = new PolylineOptions();
         final CopyOnWriteArrayList<Polyline> polylines = new CopyOnWriteArrayList<>();
 
-        //for (final Marker mrk : mAllMarkers)
         for (int i = 0; i < mAllMarkers.size(); i++)
         {
             if(mShowMarkersWithDelayIsSkip)
@@ -197,7 +206,6 @@ public class MapManipulation {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        //mrk.setVisible(true);
                         mAllMarkers.get(f_i).setVisible(true);
 
                         if ((f_i == 0) || (f_i == mAllMarkers.size()-1))
@@ -211,20 +219,6 @@ public class MapManipulation {
                             latLngBuilder.include(mAllMarkers.get(f_i-1).getPosition());
                             int size = activity.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
                             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBuilder.build(),size,size,0));
-
-                            /*if (mAllMarkers.get(f_i-1).getPosition().latitude > mAllMarkers.get(f_i).getPosition().latitude)
-                            {
-                                LatLngBounds twoMarkersBound = new LatLngBounds(mAllMarkers.get(f_i).getPosition(), mAllMarkers.get(f_i-1).getPosition());
-                                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(twoMarkersBound, 0));
-                            }
-                            else
-                            {
-                                //LatLngBounds twoMarkersBound = new LatLngBounds( mAllMarkers.get(f_i-1).getPosition(), mAllMarkers.get(f_i).getPosition());
-                                //mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(twoMarkersBound, 0));
-                            }
-                            //LatLngBounds twoMarkersBound = new LatLngBounds( mAllMarkers.get(f_i-1).getPosition(), mAllMarkers.get(f_i).getPosition());*/
-
-
                         }
                         lineOnMap.add(mAllMarkers.get(f_i).getPosition());
                         polylines.add(mGoogleMap.addPolyline(lineOnMap));
@@ -254,6 +248,7 @@ public class MapManipulation {
         mShowMarkersWithDelayIsSkip = false;
         return true;
     }
+
     public void skipShowMarkersWithDelay()
     {
         mShowMarkersWithDelayIsSkip = true;

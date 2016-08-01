@@ -3,18 +3,25 @@ void prepareData(){
 
     int i = 0;
     int j = 0;
+//ИСПРАВИТЬ!!!!
+    global_vertex_buffer_size = LOCAL_CUBE_VERTICES_BUFFER_SIZE;
+    float* local_vb_data = &G_vertex_buffer_data;
 
-    if (GLOBAL_VERTEX_BUFFER_SIZE >= LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    G_vertex_buffer_data = (float*)malloc(global_vertex_buffer_size * sizeof(float));
+    int vb_i = 0;
+    while (vb_i < global_vertex_buffer_size)
     {
-        while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
-        {
-            if (j == 3)
-            {j = 0;}
-            G_vertex_buffer_data[i] = localCubeVertices[i] + cubePositon[j];
-            i++;
-            j++;
-        }
+        G_vertex_buffer_data[vb_i] = local_vb_data[vb_i];
+        vb_i++;
+    }
 
+    while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    {
+        if (j == 3)
+        {j = 0;}
+        G_vertex_buffer_data[i] = localCubeVertices[i] + cubePositon[j];
+        i++;
+        j++;
     }
 }
 
@@ -127,10 +134,13 @@ void createProjectionMatrix(int width, int height)
 {
     float left = -1.0f;
     float right = 1.0f;
+
     float bottom = -1.0f;
     float top = 1.0f;
-    float near = 2.0f;
-    float far = 8.0f;
+
+    float near = 1.0f;
+    float far = 5.0f;
+
     float ratio = 1;
 
     if (width > height)
@@ -146,7 +156,19 @@ void createProjectionMatrix(int width, int height)
         top *= ratio;
     }
 
-    frustum(mProjectionMatrix,left,right,bottom,top,near,far);
+    float values[] = {left,right,bottom,top,near,far};
+
+    /*frustum(mProjectionMatrix,left,right,bottom,top,near,far);*/
+    jmethodID method = (*pJNIenv)->GetMethodID(pJNIenv,pSurfaceRendererWrapperClass,"createProjectionMatrix","([F)[F");
+    jfloatArray projectionValues;
+    jfloatArray projectionMatrix;
+
+    projectionValues = (*pJNIenv)->NewFloatArray(pJNIenv,6);
+    (*pJNIenv)->SetFloatArrayRegion(pJNIenv,projectionValues,0,6,values);
+
+    projectionMatrix = (jfloatArray)(*pJNIenv)->CallObjectMethod(pJNIenv,pSurfaceRendererWrapper,method,projectionValues);
+    mProjectionMatrix =(*pJNIenv)->GetFloatArrayElements(pJNIenv,projectionMatrix,0);
+
     glUniformMatrix4fv(uMatrixLocation, 1, 0, mProjectionMatrix);
 }
 
@@ -225,7 +247,6 @@ JNIEXPORT void JNICALL
 Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceCreated(JNIEnv *env, jclass type,
                                                                          jobject surfaceRendererWrapper)
 {
-
     pJNIenv = env;
     pSurfaceRendererWrapper = surfaceRendererWrapper;
     pSurfaceRendererWrapperClass = (*pJNIenv)->GetObjectClass(pJNIenv,pSurfaceRendererWrapper);//(*pJNIenv)->FindClass(pJNIenv,"SurfaceRendererWrapper");
@@ -238,5 +259,13 @@ Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_mSurfaceCreated(JNIEnv 
     //(*pJNIenv)->CallVoidMethod(pJNIenv,surfaceRendererWrapper,mmm);
 
     onSurfaceCreated();
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_addObject(JNIEnv *env, jclass type,
+                                                                   jfloat _x, jfloat _y) {
+
+    cubePositon[0] = _x;
+    cubePositon[1] = _y;
 
 }

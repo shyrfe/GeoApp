@@ -20,9 +20,9 @@ import java.util.TimeZone;
  * 2) добавить сохр ид+
  * 3) вынести логику+
  * 4)индекс на коммент
- * 5) зуум к точке
- * 6)плей пауз
- * 7)скрость прокрутки
+ * 5) зуум к точке+
+ * 6)плей пауз+
+ * 7)скрость прокрутки+
  *
  */
 public class Record
@@ -82,11 +82,6 @@ public class Record
         mId = id;
     }
 
-
-
-    //public Record(String, ...)
-    //public Record(Location)
-
     public Record (long id, long timestamp,String imei, int interval, String comment, double latitude, double longitude, float radius, float speed)
     {
         mId = id;
@@ -104,24 +99,6 @@ public class Record
     {
         if (location != null)
         {
-            /*mSharPref = context.getSharedPreferences(LOCAL_PREFERENCES,context.MODE_PRIVATE);
-            String lastId;
-            if ((lastId = mSharPref.getString("LAST_ID","")).equals(""))
-            {
-                lastId = "1";
-                Editor ed = mSharPref.edit();
-                ed.putString("LAST_ID",lastId);
-                ed.commit();
-            }
-            else
-            {
-                lastId = String.valueOf((Long.valueOf(lastId)+1));
-                Editor ed = mSharPref.edit();
-                ed.putString("LAST_ID",lastId);
-                ed.commit();
-            }*/
-
-            /*mId = id;*/
             mTimestamp = location.getTime();
             mImei = imei;
             mInterval = 30;
@@ -136,24 +113,6 @@ public class Record
     {
         if (location != null)
         {
-            /*mSharPref = context.getSharedPreferences(LOCAL_PREFERENCES,context.MODE_PRIVATE);
-            String lastId;
-            if ((lastId = mSharPref.getString("LAST_ID","")).equals(""))
-            {
-                lastId = "1";
-                Editor ed = mSharPref.edit();
-                ed.putString("LAST_ID",lastId);
-                ed.commit();
-            }
-            else
-            {
-                lastId = String.valueOf((Long.valueOf(lastId)+1));
-                Editor ed = mSharPref.edit();
-                ed.putString("LAST_ID",lastId);
-                ed.commit();
-            }*/
-
-            /*mId = id;*/
             mTimestamp = location.getTime();
             mImei = imei;
             mInterval = 0;

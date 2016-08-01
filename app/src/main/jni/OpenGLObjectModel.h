@@ -36,7 +36,8 @@ static int uMatrixLocation; //id для uMatrix в шейдере
 //static const POJECTION_AND_VIEW_MATRIX_SIZE = 16;
 
 
-static GLfloat mProjectionMatrix[POJECTION_AND_VIEW_MATRIX_SIZE];
+//static GLfloat mProjectionMatrix[POJECTION_AND_VIEW_MATRIX_SIZE];
+static GLfloat* mProjectionMatrix;
 static GLfloat* mViewMatrix;
 static GLfloat* mMatrix;
 
@@ -49,47 +50,14 @@ float upY;
 float upZ;
 
 static GLuint programID;
-#define VERTEX_S 0.4f
-#define VERTEX_D 0.9f
-#define VERTEX_L 3.0f
-#define VERTEX_X 2
-/*static const GLfloat G_vertex_buffer_data[] = {
 
-        -2*VERTEX_S, -VERTEX_S, VERTEX_D,
-        2*VERTEX_S, -VERTEX_S, VERTEX_D,
-        0, VERTEX_S, VERTEX_D,
+//#define GLOBAL_VERTEX_BUFFER_SIZE 72
+int global_vertex_buffer_size = 0;
+static GLfloat* G_vertex_buffer_data;
 
-        // второй треугольник
-        -2*VERTEX_S, -VERTEX_S, -VERTEX_D,
-        2*VERTEX_S, -VERTEX_S, -VERTEX_D,
-        0, VERTEX_S, -VERTEX_D,
 
-        // третий треугольник
-        VERTEX_D, -VERTEX_S, -2*VERTEX_S,
-        VERTEX_D, -VERTEX_S, 2*VERTEX_S,
-        VERTEX_D, VERTEX_S, 0,
-
-        // четвертый треугольник
-        -VERTEX_D, -VERTEX_S, -2*VERTEX_S,
-        -VERTEX_D, -VERTEX_S, 2*VERTEX_S,
-        -VERTEX_D, VERTEX_S, 0,
-
-};*/
-#define GLOBAL_VERTEX_BUFFER_SIZE 72
-static GLfloat G_vertex_buffer_data[GLOBAL_VERTEX_BUFFER_SIZE];
-/*static GLfloat G_vertex_buffer_data[] = {
-
-        -2.0f,2.0f,0,
-        -1.5f,2.0f,0,
-        -1.5f,1.5f,0,
-
-        -2.0f,1.5f,0,
-        -2.0f,2.0f,0,
-        -1.5f,1.5f,0
-};*/
-
-//float cubePositon[3] = {-1.5f,1.5f,0};
-float cubePositon[3] = {-0.5f,0.5f,0};
+float cubePositon[3] = {-0.5f,0.5f,-1.0f};
+//float cubePositon[3] = {100.5f,100.5f,0};
 #define LOCAL_CUBE_VERTICES_BUFFER_SIZE 72
 float localCubeVertices[] = {
         //triangle 1
@@ -110,7 +78,7 @@ float localCubeVertices[] = {
 
         -0.15f,0.15f,-0.15f,
         0.15f,0.15f,-0.15f,
-        0.15f,-0.15f,-0.15,
+        0.15f,-0.15f,-0.15f,
 
         //triangle 5
         -0.15f,0.15f,-0.15f,
@@ -133,8 +101,6 @@ float localCubeVertices[] = {
         0.15f,-0.15f,-0.15f,
 
 };
-
-
 
 void onSurfaceCreated();
 void onSurfaceChanged(int width, int height);
