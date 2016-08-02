@@ -1,28 +1,73 @@
 #include "OpenGLObjectModel.h"
+void clearPositionBuffer()
+{
+    float* local_buff = &cubePositions;
+    cubePositions = NULL;
+
+    //free(local_buff);
+}
+void clearVertexBuffer()
+{
+    global_vertex_buffer_size = 0;
+    float* local_buff = &G_vertex_buffer_data;
+    G_vertex_buffer_data = NULL;
+
+    //bindData();
+    //free(local_buff);
+}
 void prepareData(){
 
     int i = 0;
     int j = 0;
-//ИСПРАВИТЬ!!!!
-    global_vertex_buffer_size = LOCAL_CUBE_VERTICES_BUFFER_SIZE;
-    float* local_vb_data = &G_vertex_buffer_data;
 
-    G_vertex_buffer_data = (float*)malloc(global_vertex_buffer_size * sizeof(float));
-    int vb_i = 0;
-    while (vb_i < global_vertex_buffer_size)
+    if (global_vertex_buffer_size != 0)
     {
-        G_vertex_buffer_data[vb_i] = local_vb_data[vb_i];
-        vb_i++;
+        int vertexNumber = global_vertex_buffer_size / LOCAL_CUBE_VERTICES_BUFFER_SIZE;
+        int vertex_i = 0;
+        while (vertex_i < vertexNumber) {
+            while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+            {
+                if (j == 3) { j = 0; }
+                G_vertex_buffer_data[(vertex_i * LOCAL_CUBE_VERTICES_BUFFER_SIZE) + i] =
+                        localCubeVertices[i] + cubePositions[(vertex_i * 3) + j];
+                i++;
+                j++;
+            }
+            i = 0;
+            j = 0;
+            vertex_i++;
+        }
     }
+}
+
+void addObjectVertexData(float _x , float _y, float _z)
+{
+    int i = 0;
+    int j = 0;
+    ALOG("GLOBAL do %i",global_vertex_buffer_size);
+    global_vertex_buffer_size += LOCAL_CUBE_VERTICES_BUFFER_SIZE;
+    ALOG("GLOBAL posle %i",global_vertex_buffer_size);
+    G_vertex_buffer_data = (float*)realloc(G_vertex_buffer_data,(sizeof(float)*global_vertex_buffer_size));
+
+    int vertexNumber = ((global_vertex_buffer_size/LOCAL_CUBE_VERTICES_BUFFER_SIZE)-1);
+
+    cubePositions = (float*)realloc(cubePositions,sizeof(float)*((vertexNumber+1)*3));
+
+    cubePositions[vertexNumber*3] = _x;
+    cubePositions[(vertexNumber*3)+1] = _y;
+    cubePositions[(vertexNumber*3)+2] = _z;
+    //ALOG("x,y,z: %f , %f , %f",cubePositions[vertexNumber*3],cubePositions[(vertexNumber*3)+1],cubePositions[(vertexNumber*3)+2]);
 
     while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
     {
         if (j == 3)
         {j = 0;}
-        G_vertex_buffer_data[i] = localCubeVertices[i] + cubePositon[j];
+        G_vertex_buffer_data[(LOCAL_CUBE_VERTICES_BUFFER_SIZE*vertexNumber)+i] = localCubeVertices[i] + cubePositions[(3*vertexNumber)+j];
+        //ALOG("G_Vertex: %f",G_vertex_buffer_data[(LOCAL_CUBE_VERTICES_BUFFER_SIZE*vertexNumber)+i]);
         i++;
         j++;
     }
+
 }
 
 void rotateVertexBufferCubeX(float A)
@@ -31,6 +76,7 @@ void rotateVertexBufferCubeX(float A)
     A = A * M_PI/180;
 
     float m[LOCAL_CUBE_VERTICES_BUFFER_SIZE];
+
     while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
     {
         m[i] = localCubeVertices[i] * 1 + localCubeVertices[i+1] * 0 + localCubeVertices[i+2] * 0;
@@ -38,6 +84,32 @@ void rotateVertexBufferCubeX(float A)
         m[i+2] = localCubeVertices[i] * 0 + localCubeVertices[i+1] * (-1*sinf(A)) + localCubeVertices[i+2] * cosf(A);
         i += 3;
     }
+
+
+    i=0;
+    while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    {
+        localCubeVertices[i] = m[i];
+        i++;
+    }
+    i=0;
+    prepareData();
+}
+void rotateVertexBufferObjectY(float A)
+{
+    int i = 0;
+    A = A * M_PI/180;
+
+    float m[LOCAL_CUBE_VERTICES_BUFFER_SIZE];
+
+    while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
+    {
+        m[i] = localCubeVertices[i] * cosf(A) + localCubeVertices[i+1] * 0 + localCubeVertices[i+2] * sinf(A);
+        m[i+1] = localCubeVertices[i] * 0 + localCubeVertices[i+1] * 1 + localCubeVertices[i+2] * 0;
+        m[i+2] = localCubeVertices[i] * (-1*sinf(A)) + localCubeVertices[i+1] * 0 + localCubeVertices[i+2] * cosf(A);
+        i += 3;
+    }
+
 
     i=0;
     while (i < LOCAL_CUBE_VERTICES_BUFFER_SIZE)
@@ -129,7 +201,6 @@ void frustum(float ProjectionMatrix[],float left, float right, float bottom, flo
     ProjectionMatrix[3*4+3]=0.0f;
 }
 
-
 void createProjectionMatrix(int width, int height)
 {
     float left = -1.0f;
@@ -180,7 +251,10 @@ void onSurfaceCreated()
     glUseProgram(programID);
 
     createViewMatrix();
-    prepareData();
+
+
+
+    //prepareData();
     bindData();
 }
 
@@ -189,31 +263,48 @@ void onSurfaceChanged(int width, int height)
     glViewport(0,0,width,height);
     createProjectionMatrix(width,height);
     bindMatrix();
+    /*addObjectVertexData(-0.5f,0.5f,-1.0f);
+    addObjectVertexData(0.5f,-0.5f,-1.0f);
+    bindData();*/
 }
 
 void onDrawFrame()
 {
     //createViewMatrix();
     bindMatrix();
-    rotateVertexBufferCubeX(2);
+    if(global_vertex_buffer_size != 0)
+    {
+        rotateVertexBufferObjectY(2);
+    }
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    int i =0;
+    while(i < (global_vertex_buffer_size/LOCAL_CUBE_VERTICES_BUFFER_SIZE))
+    {
+        glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_TRIANGLES, (i*9), 3);
+        glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_TRIANGLES, (i*9)+3, 3);
+        glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
+        glDrawArrays(GL_TRIANGLES, (i*9)+6, 3);
+        i++;
+    }
 
-    // треугольники
-    glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+    clearPositionBuffer();
+    clearVertexBuffer();
+   /* glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawArrays(GL_TRIANGLES, 3, 3);
-
     glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 6, 3);
-    glDrawArrays(GL_TRIANGLES, 9, 3);
-
+    glDrawArrays(GL_TRIANGLES, 3, 3);
     glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 6, 3);
+    glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 9, 3);
+    glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 12, 3);
-    glDrawArrays(GL_TRIANGLES, 15, 3);
-
-    glUniform4f(uColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLES, 18, 3);
-    glDrawArrays(GL_TRIANGLES, 21, 3);
+    glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLES, 15, 3);*/
 }
 
 JNIEXPORT void JNICALL
@@ -265,7 +356,18 @@ JNIEXPORT void JNICALL
 Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_addObject(JNIEnv *env, jclass type,
                                                                    jfloat _x, jfloat _y) {
 
-    cubePositon[0] = _x;
-    cubePositon[1] = _y;
+    /*cubePositon[0] = _x;
+    cubePositon[1] = _y;*/
+    //ALOG("Object Added");
+    addObjectVertexData(_x,_y,-1.0f);
+    bindData();
+
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_clearAllData(JNIEnv *env, jclass type) {
+
+    clearPositionBuffer();
+    clearVertexBuffer();
 
 }

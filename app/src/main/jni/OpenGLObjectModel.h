@@ -51,60 +51,32 @@ float upZ;
 
 static GLuint programID;
 
-//#define GLOBAL_VERTEX_BUFFER_SIZE 72
-int global_vertex_buffer_size = 0;
+
+static int global_vertex_buffer_size = 0;
 static GLfloat* G_vertex_buffer_data;
+static float* cubePositions;
 
-
-float cubePositon[3] = {-0.5f,0.5f,-1.0f};
-//float cubePositon[3] = {100.5f,100.5f,0};
-#define LOCAL_CUBE_VERTICES_BUFFER_SIZE 72
+//float cubePositions[6] = {-0.5f,0.5f,-1.0f,0.5f,-0.5f,-1.0f};
+#define LOCAL_CUBE_VERTICES_BUFFER_SIZE 27
 float localCubeVertices[] = {
-        //triangle 1
-        -0.15f,-0.15f,0.15f,
-        -0.15f,0.15f,0.15f,
-        0.15f,-0.15f,0.15f,
-        //triangle 2
+         0,    0,   0,
+        -0.05f,0.15f,0.05f,
+         0.05f,0.15f,0.05f,
 
-        -0.15f,0.15f,0.15f,
-        0.15f,0.15f,0.15f,
-        0.15f,-0.15f,0.15,
-        //triangle 3
+         0,    0,   0,
+         -0.05f,0.15f,0.05f,
+         0,    0.15f,-0.05f,
 
-        -0.15f,-0.15f,-0.15f,
-        -0.15f,0.15f,-0.15f,
-        0.15f,-0.15f,-0.15f,
-        //triangle 4
-
-        -0.15f,0.15f,-0.15f,
-        0.15f,0.15f,-0.15f,
-        0.15f,-0.15f,-0.15f,
-
-        //triangle 5
-        -0.15f,0.15f,-0.15f,
-        -0.15f,0.15f,0.15f,
-        -0.15f,-0.15f,0.15f,
-
-        //triangle 6
-        -0.15f,0.15f,-0.15f,
-        -0.15f,-0.15f,0.15f,
-        -0.15f,-0.15f,-0.15f,
-
-        //triangle 7
-        0.15f,0.15f,-0.15f,
-        0.15f,0.15f,0.15f,
-        0.15f,-0.15f,0.15f,
-
-        //triangle 8
-        0.15f,0.15f,-0.15f,
-        0.15f,-0.15f,0.15f,
-        0.15f,-0.15f,-0.15f,
-
+         0,    0,   0,
+         0,    0.15f,-0.05f,
+         0.05f,0.15f,0.05f
 };
+
 
 void onSurfaceCreated();
 void onSurfaceChanged(int width, int height);
 void onDrawFrame();
 void createProjectionMatrix(int width, int height);
+void addObjectVertexData(float _x , float _y, float _z);
 void bindMatrix();
 void createViewMatrix();

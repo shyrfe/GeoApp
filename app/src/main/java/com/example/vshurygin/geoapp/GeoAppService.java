@@ -96,7 +96,7 @@ public class GeoAppService extends Service {
 
         if (MainActivity.sGoogleMap != null)
         {
-            mapManipulation = new MapManipulation(MainActivity.sGoogleMap,mRecordLog);
+            mapManipulation = new MapManipulation(MainActivity.sGoogleMap,mRecordLog,MainActivity.mSurfaceRenderer);
         }
         mTimer = new Timer();
         mTimer.schedule(new XMLpackTimer(),0,30000);

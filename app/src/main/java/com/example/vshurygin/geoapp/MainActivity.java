@@ -79,11 +79,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static GoogleMap sGoogleMap;
+    public static SurfaceRendererWrapper mSurfaceRenderer;
 
     private GLSurfaceView mGlSurfaceView;
     private boolean rendererSet;
 
-    final private int UPDATE_MARKERS_TIME = 2000;
+    final private int UPDATE_MARKERS_TIME = 1000;
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     private Button mCommentButton;
     private Button mPlayDelayMarkersButton;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean mIsServiceBind = false;
     private boolean mIsPlayDelayMarkersOn = false;
 
-    private SurfaceRendererWrapper mSurfaceRenderer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

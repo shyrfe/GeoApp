@@ -13,14 +13,21 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.Matrix;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
 
@@ -32,6 +39,7 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     static native void mSurfaceChanged(SurfaceRendererWrapper surfaceRendererWrapper,int width, int height);
     static native void mDrawframe(SurfaceRendererWrapper surfaceRendererWrapper);
     static native void addObject(float _x, float _y);
+    static native void clearAllData();
 
     private int mWidth;
     private int mHeight;
@@ -39,6 +47,8 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     private float[] mProjectionMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
     float[] mMatrix = new float[16];
+
+    private CopyOnWriteArrayList<MarkerPosition> mAllMarkers = new CopyOnWriteArrayList<>();
 
     public SurfaceRendererWrapper (Context context)
     {this.context = context;}
@@ -56,21 +66,36 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         mHeight = height;
 
         mSurfaceChanged(this,width,height);
+
     }
     @Override
     public void onDrawFrame(GL10 gl)
     {
+        for (int i = 0; i < mAllMarkers.size();i++)
+        {
+            addObject(mAllMarkers.get(i).getXInGLCoord(),mAllMarkers.get(i).getYInGLCoord());
+        }
         mDrawframe(this);
+        clearAllData();
     }
 
-    public void add3DMarker(int _x, int _y)
+    public void add3DMarker(final int _x, final int _y)
     {
+               /* if ((mWidth != 0) && (mHeight != 0))
+                {
+                    float x  = (1.0f-((float)_x/((float)mWidth/2.0f)))*(-1.0f);
+                    float y = (1.0f-((float)_y/((float)mHeight/2.0f)));//(float)_y/(mHeight/2);
+                    addObject(x,y);
+                }*/
         if ((mWidth != 0) && (mHeight != 0))
         {
-            float x  = (1.0f-((float)_x/((float)mWidth/2.0f)))*(-1.0f);
-            float y = (1.0f-((float)_y/((float)mHeight/2.0f)));//(float)_y/(mHeight/2);
-            addObject(x,y);
+            mAllMarkers.add(new MarkerPosition(_x,_y));
         }
+
+    }
+    public void deleteMarkers()
+    {
+        mAllMarkers.clear();
     }
 // C function Wrappers
     public float[] mFrustum()
@@ -143,4 +168,28 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         return mMatrix;
     }
 ////////////////////////
+    private class MarkerPosition
+    {
+        private int mX;
+        private int mY;
+        MarkerPosition(int _x , int _y)
+        {
+            mX = _x;
+            mY = _y;
+        }
+
+        public int getX()
+        {return mX;}
+        public int getY()
+        {return mY;}
+        public float getXInGLCoord()
+        {
+                    return (1.0f-((float)mX/((float)mWidth/2.0f)))*(-1.0f);
+        }
+        public float getYInGLCoord()
+        {
+            return  (1.0f-((float)mY/((float)mHeight/2.0f)));
+        }
+    }
 }
+

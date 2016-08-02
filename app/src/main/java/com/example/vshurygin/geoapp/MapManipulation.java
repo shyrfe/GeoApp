@@ -37,16 +37,19 @@ public class MapManipulation {
 
     private GoogleMap mGoogleMap;
     private RecordLog mRecordLog;
+    private SurfaceRendererWrapper mSurfaceRendererWrapper;
 
     private  CopyOnWriteArrayList<Marker> mAllMarkers;
 
     private CopyOnWriteArrayList<Record> mAllRecords = new CopyOnWriteArrayList<Record>();
     private boolean mShowMarkersWithDelayIsSkip = false;
 
-    public MapManipulation(GoogleMap googleMap, RecordLog recordLog)
+    public MapManipulation(GoogleMap googleMap, RecordLog recordLog,SurfaceRendererWrapper surfaceRendererWrapper)
     {
         mGoogleMap = googleMap;
         mRecordLog = recordLog;
+        mSurfaceRendererWrapper = surfaceRendererWrapper;
+        //mSurfaceRendererWrapper.add3DMarker(521,633);
         try
         {
             mAllRecords.addAll(mRecordLog.readAll());
@@ -68,7 +71,6 @@ public class MapManipulation {
         {
             e.printStackTrace();
         }
-
     }
 
     public void addAllMarkers()
@@ -166,7 +168,7 @@ public class MapManipulation {
     public void showAllMarkers()
     {
         Handler mainHandler = new Handler(Looper.getMainLooper());
-
+       mSurfaceRendererWrapper.deleteMarkers();
         Runnable myRunnable = new Runnable() {
             @Override
             public void run()
@@ -174,14 +176,15 @@ public class MapManipulation {
                 for (Marker mrk: mAllMarkers)
                 {
                     mrk.setVisible(true);
-
+                    /////////test///////////
+                    LatLng latLng = mrk.getPosition();
+                    Projection projection = mGoogleMap.getProjection();
+                    Point point = projection.toScreenLocation(latLng);
+                    mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+                    Log.d("Marker",point.toString());
+                    ////////////////////////
                 }
-/*                /////////test///////////
-                LatLng latLng = mAllMarkers.get(0).getPosition();
-                Projection projection = mGoogleMap.getProjection();
-                Point point = projection.toScreenLocation(latLng);
-                Log.d("Marker",point.toString());
-                ////////////////////////*/
+
             }
         };
         mainHandler.post(myRunnable);
