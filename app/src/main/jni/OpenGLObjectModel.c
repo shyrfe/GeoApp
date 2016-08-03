@@ -1,17 +1,18 @@
 #include "OpenGLObjectModel.h"
 void clearPositionBuffer()
 {
-    float* local_buff = &cubePositions;
-    cubePositions = NULL;
+    //float* local_buff = &cubePositions;
+    //cubePositions = NULL;
 
     //free(local_buff);
+    //free(cubePositions);
 }
 void clearVertexBuffer()
 {
     global_vertex_buffer_size = 0;
-    float* local_buff = &G_vertex_buffer_data;
-    G_vertex_buffer_data = NULL;
-
+    //float* local_buff = &G_vertex_buffer_data;
+    //G_vertex_buffer_data = NULL;
+    //free(G_vertex_buffer_data);
     //bindData();
     //free(local_buff);
 }
@@ -291,8 +292,13 @@ void onDrawFrame()
         i++;
     }
 
-    clearPositionBuffer();
-    clearVertexBuffer();
+    //free(G_vertex_buffer_data);
+    //G_vertex_buffer_data = NULL;
+    global_vertex_buffer_size = 0;
+    //free(cubePositions);
+    //cubePositions = NULL;
+    //clearPositionBuffer();
+    //clearVertexBuffer();
    /* glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glUniform4f(uColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
@@ -367,7 +373,7 @@ Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_addObject(JNIEnv *env, 
 JNIEXPORT void JNICALL
 Java_com_example_vshurygin_geoapp_SurfaceRendererWrapper_clearAllData(JNIEnv *env, jclass type) {
 
-    clearPositionBuffer();
-    clearVertexBuffer();
+    //clearPositionBuffer();
+    //clearVertexBuffer();
 
 }

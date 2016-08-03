@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static GoogleMap sGoogleMap;
     public static SurfaceRendererWrapper mSurfaceRenderer;
+    public static LinearLayout sLinearLayout;
 
     private GLSurfaceView mGlSurfaceView;
     private boolean rendererSet;
@@ -322,7 +323,13 @@ public class MainActivity extends AppCompatActivity {
         try{
             if (sGoogleMap == null)
             {
-                sGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMap();
+                OnMapReadyCallback mapReadyCallback = new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap googleMap) {
+                        sGoogleMap = googleMap;
+                    }
+                };
+                sGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMapAsync(mapReadyCallback);//.getMap();
                 if (sGoogleMap == null)
                 {
                     Toast.makeText(MainActivity.this,
@@ -357,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (isSupportsEs2)
         {
-            LinearLayout linearLayout = (LinearLayout) findViewById(R.id.GLlayout);
+            sLinearLayout = (LinearLayout) findViewById(R.id.GLlayout);
 
             mGlSurfaceView = new GLSurfaceView(MainActivity.this);
 
@@ -372,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
             rendererSet = true;
 
-            linearLayout.addView(mGlSurfaceView,0);
+            sLinearLayout.addView(mGlSurfaceView,0);
 
         }
         else

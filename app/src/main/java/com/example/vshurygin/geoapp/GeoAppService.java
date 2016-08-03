@@ -106,6 +106,10 @@ public class GeoAppService extends Service {
     @Override
     public void onDestroy()
     {
+        if (MainActivity.mSurfaceRenderer != null)
+        {
+            MainActivity.mSurfaceRenderer.deleteMarkers();
+        }
         mRecordLog.WriterSwitch(false);
         Log.d("Service","Destroy");
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)

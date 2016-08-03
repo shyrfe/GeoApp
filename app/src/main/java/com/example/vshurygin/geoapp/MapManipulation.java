@@ -6,18 +6,28 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.LinearLayout;
+
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
 import com.google.android.gms.vision.text.internal.client.RecognitionOptions;
 
 import java.util.ArrayList;
@@ -49,6 +59,93 @@ public class MapManipulation {
         mGoogleMap = googleMap;
         mRecordLog = recordLog;
         mSurfaceRendererWrapper = surfaceRendererWrapper;
+
+       /* Timer update3DMarkerTimer = new Timer();
+        update3DMarkerTimer.schedule(new TimerTask() {
+            @Override
+            public void run()
+            {
+                Projection projection = mGoogleMap.getProjection();
+                mSurfaceRendererWrapper.deleteMarkers();
+                //for (int i = 0; i < mAllMarkers.size(); i++)
+                //{
+                    //LatLng latLng = mAllMarkers.get(i).getPosition();
+
+                    //Point point = projection.toScreenLocation(latLng);
+                    //mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+                //}
+            }
+        },0,500);*/
+        /*if (MainActivity.sLinearLayout != null)
+        {
+            MainActivity.sLinearLayout.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Log.d("Touch",String.valueOf(event.getActionMasked()));
+                    if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
+                    {
+                        mSurfaceRendererWrapper.deleteMarkers();
+                        return true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < mAllMarkers.size(); i++)
+                        {
+                            LatLng latLng = mAllMarkers.get(i).getPosition();
+                            Projection projection = mGoogleMap.getProjection();
+                            Point point = projection.toScreenLocation(latLng);
+                            mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+                        }
+
+                    }
+
+                    return false;
+                }
+            });
+
+           *//* MainActivity.sLinearLayout.setOnDragListener(new View.OnDragListener() {
+                @Override
+                public boolean onDrag(View v, DragEvent event) {
+                    Log.d("Touch","Drag");
+                    mSurfaceRendererWrapper.deleteMarkers();
+                    return false;
+                }
+            });
+            MainActivity.sLinearLayout.setOnHoverListener(new View.OnHoverListener() {
+                @Override
+                public boolean onHover(View v, MotionEvent event) {
+                    Log.d("Touch","Hover");
+                    mSurfaceRendererWrapper.deleteMarkers();
+                    return false;
+                }
+            });*//*
+        }*/
+
+        
+        mGoogleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition)
+            {
+                try
+                {
+                    mSurfaceRendererWrapper.deleteMarkers();
+                    for (int i = 0; i < mAllMarkers.size(); i++)
+                    {
+                        LatLng latLng = mAllMarkers.get(i).getPosition();
+                        Projection projection = mGoogleMap.getProjection();
+                        Point point = projection.toScreenLocation(latLng);
+                        mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+                    }
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
         //mSurfaceRendererWrapper.add3DMarker(521,633);
         try
         {
@@ -85,6 +182,12 @@ public class MapManipulation {
                 {
                     Marker mrk = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(rec.getLatitude(),rec.getLongitude())).visible(false).title(rec.getComment()));
                     mAllMarkers.add(mrk);
+
+                    LatLng latLng = mrk.getPosition();
+                    Projection projection = mGoogleMap.getProjection();
+                    Point point = projection.toScreenLocation(latLng);
+                    mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+
                 }
             }
         };
@@ -167,8 +270,9 @@ public class MapManipulation {
 
     public void showAllMarkers()
     {
+
         Handler mainHandler = new Handler(Looper.getMainLooper());
-       mSurfaceRendererWrapper.deleteMarkers();
+       //mSurfaceRendererWrapper.deleteMarkers();
         Runnable myRunnable = new Runnable() {
             @Override
             public void run()
@@ -176,13 +280,6 @@ public class MapManipulation {
                 for (Marker mrk: mAllMarkers)
                 {
                     mrk.setVisible(true);
-                    /////////test///////////
-                    LatLng latLng = mrk.getPosition();
-                    Projection projection = mGoogleMap.getProjection();
-                    Point point = projection.toScreenLocation(latLng);
-                    mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
-                    Log.d("Marker",point.toString());
-                    ////////////////////////
                 }
 
             }
@@ -198,6 +295,8 @@ public class MapManipulation {
 
         final PolylineOptions lineOnMap = new PolylineOptions();
         final CopyOnWriteArrayList<Polyline> polylines = new CopyOnWriteArrayList<>();
+
+        mSurfaceRendererWrapper.deleteMarkers();
 
         for (int i = 0; i < mAllMarkers.size(); i++)
         {
@@ -225,6 +324,14 @@ public class MapManipulation {
                         }
                         lineOnMap.add(mAllMarkers.get(f_i).getPosition());
                         polylines.add(mGoogleMap.addPolyline(lineOnMap));
+                        mSurfaceRendererWrapper.deleteMarkers();
+                        for (int j= 0; j < f_i; j++)
+                        {
+                            LatLng latLng = mAllMarkers.get(j).getPosition();
+                            Projection projection = mGoogleMap.getProjection();
+                            Point point = projection.toScreenLocation(latLng);
+                            mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
+                        }
                     }
                 };
 
@@ -260,5 +367,11 @@ public class MapManipulation {
     private void addMarker(Marker marker)
     {
         mAllMarkers.add(marker);
+
+        LatLng latLng = marker.getPosition();
+        Projection projection = mGoogleMap.getProjection();
+        Point point = projection.toScreenLocation(latLng);
+        mSurfaceRendererWrapper.add3DMarker(point.x,point.y);
     }
+
 }

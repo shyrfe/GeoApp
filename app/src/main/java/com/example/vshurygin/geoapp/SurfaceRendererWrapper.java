@@ -76,7 +76,6 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
             addObject(mAllMarkers.get(i).getXInGLCoord(),mAllMarkers.get(i).getYInGLCoord());
         }
         mDrawframe(this);
-        clearAllData();
     }
 
     public void add3DMarker(final int _x, final int _y)
@@ -93,9 +92,14 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         }
 
     }
+    public void refresh3DMarker(int marker_n,int _x, int _y)
+    {
+        mAllMarkers.get(marker_n).setXY(_x,_y);
+    }
     public void deleteMarkers()
     {
-        mAllMarkers.clear();
+        //mAllMarkers.clear();
+        mAllMarkers = new CopyOnWriteArrayList<>();
     }
 // C function Wrappers
     public float[] mFrustum()
@@ -182,6 +186,16 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
         {return mX;}
         public int getY()
         {return mY;}
+        public void setX(int _x)
+        {
+            mX = _x;
+        }
+        public void setY(int _y) { mY = _y; }
+        public void setXY(int _x, int _y)
+        {
+            mX = _x;
+            mY = _y;
+        }
         public float getXInGLCoord()
         {
                     return (1.0f-((float)mX/((float)mWidth/2.0f)))*(-1.0f);
