@@ -96,7 +96,7 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     {
         mAllMarkers.get(marker_n).setXY(_x,_y);
     }
-    public void deleteMarkers()
+    public void delete3DMarkers()
     {
         //mAllMarkers.clear();
         mAllMarkers = new CopyOnWriteArrayList<>();

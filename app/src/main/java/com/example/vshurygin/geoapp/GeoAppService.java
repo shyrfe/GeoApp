@@ -108,7 +108,7 @@ public class GeoAppService extends Service {
     {
         if (MainActivity.mSurfaceRenderer != null)
         {
-            MainActivity.mSurfaceRenderer.deleteMarkers();
+            MainActivity.mSurfaceRenderer.delete3DMarkers();
         }
         mRecordLog.WriterSwitch(false);
         Log.d("Service","Destroy");

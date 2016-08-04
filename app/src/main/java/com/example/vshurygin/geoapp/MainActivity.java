@@ -16,7 +16,10 @@ package com.example.vshurygin.geoapp;
  13)плей пауз(менять кнопку плэй) +
  14)скрость прокрутки плэя+
  15)рисовать полоску между точками+
- 16)OpenGL нарисовать нечто на карте нативными средствами
+ 16)OpenGL нарисовать нечто на карте нативными средствами+
+ 17)API с запросами по чему либо, магазины, кафе, музеи...(гугловские скорее всего) запросы через json (наверно)
+ 18)новый активити с отображением таблицы с результатами поиска по карте
+
 * */
 import android.Manifest;
 import android.app.ActivityManager;
@@ -68,6 +71,9 @@ import java.util.TimerTask;
 import com.example.vshurygin.geoapp.GeoAppService.MyBinder;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -110,8 +116,10 @@ public class MainActivity extends AppCompatActivity {
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         createMapView();
+        //GoogleApiClient
         //Log.d("Native",getMsgFromJni());
         GLSurfaceInitialize();
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mMarkersDelaySpeedSeekBar = (SeekBar)findViewById(R.id.markersDelaySpeedSeekBar);
         mMarkersDelaySpeedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -216,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (mIsServiceBind && (mLocalGeoAppService.mapManipulation != null) && (!mIsPlayDelayMarkersOn))
                 {
-                    mLocalGeoAppService.mapManipulation.showAllMarkers();
+                    //mLocalGeoAppService.mapManipulation.showAllMarkers();
                 }
             }
         },0,UPDATE_MARKERS_TIME);
@@ -282,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             //mLocalGeoAppService.mapManipulation.showAllMarkers();
-                            mLocalGeoAppService.mapManipulation.showAllMarkers();
+                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
                         }
                     },500);
                 }
@@ -327,14 +335,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onMapReady(GoogleMap googleMap) {
                         sGoogleMap = googleMap;
+                        if (sGoogleMap == null)
+                        {
+                            Toast.makeText(MainActivity.this,
+                                    "Error creating map",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 };
-                sGoogleMap = ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMapAsync(mapReadyCallback);//.getMap();
-                if (sGoogleMap == null)
-                {
-                    Toast.makeText(MainActivity.this,
-                            "Error creating map",Toast.LENGTH_SHORT).show();
-                }
+                ((MapFragment)getFragmentManager().findFragmentById(R.id.mapView)).getMapAsync(mapReadyCallback);//.getMap();
+
             }
         }
         catch (NullPointerException e)
