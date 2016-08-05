@@ -40,7 +40,9 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".SearchResultActivity"></activity>
+        <activity android:name=".SearchResultActivity">
+
+        </activity>
     </application>
 
 </manifest>

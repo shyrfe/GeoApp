@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     //private int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
     private Button mCommentButton;
     private Button mPlayDelayMarkersButton;
+    private Button mSearchButton;
     private ToggleButton mOnOffTogButton;
     private LocationManager mLocationManager;
     private TextView mStatusView;
@@ -142,6 +143,18 @@ public class MainActivity extends AppCompatActivity {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mStatusView = (TextView)findViewById(R.id.StatusView);
         mStatusView.setText("Service Status: " + (isServiceRunning(GeoAppService.class)?"ON":"OFF"));
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        mSearchButton = (Button)findViewById(R.id.SearchButton);
+        mSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
+                startActivity(intent);
+
+                //Toast.makeText(MainActivity.this,"SearchOK!",Toast.LENGTH_SHORT).show();
+            }
+        });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mSpeedDistanceStatus = (TextView)findViewById(R.id.speedDistanceView);
         Timer speedDistanceTimer = new Timer();
@@ -219,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        Timer markersUpdateTimer = new Timer();
+        /*Timer markersUpdateTimer = new Timer();
         markersUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -228,8 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     //mLocalGeoAppService.mapManipulation.showAllMarkers();
                 }
             }
-        },0,UPDATE_MARKERS_TIME);
-
+        },0,UPDATE_MARKERS_TIME);*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mCommentButton = (Button) findViewById(R.id.CommentButton);
         mCommentBar = (EditText) findViewById(R.id.CommentText);
@@ -262,11 +274,8 @@ public class MainActivity extends AppCompatActivity {
                     },2000);
                     mCommentBar.setText("");
                 }
-
             }
         });
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mOnOffTogButton = (ToggleButton)findViewById(R.id.ONOFFtogButton);
         mOnOffTogButton.setChecked(isServiceRunning(GeoAppService.class)?true:false);
@@ -289,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
                             {
                                 startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                             }
-
                             //mLocalGeoAppService.mapManipulation.showAllMarkers();
                             //mLocalGeoAppService.mapManipulation.showAllMarkers();
                         }
@@ -311,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private ServiceConnection mServiceConection = new ServiceConnection() {
         @Override
@@ -329,12 +336,15 @@ public class MainActivity extends AppCompatActivity {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void createMapView()
     {
-        try{
+        try
+        {
             if (sGoogleMap == null)
             {
-                OnMapReadyCallback mapReadyCallback = new OnMapReadyCallback() {
+                OnMapReadyCallback mapReadyCallback = new OnMapReadyCallback()
+                {
                     @Override
-                    public void onMapReady(GoogleMap googleMap) {
+                    public void onMapReady(GoogleMap googleMap)
+                    {
                         sGoogleMap = googleMap;
                         if (sGoogleMap == null)
                         {
@@ -385,7 +395,6 @@ public class MainActivity extends AppCompatActivity {
 
             mSurfaceRenderer = new SurfaceRendererWrapper(MainActivity.this);
             mGlSurfaceView.setRenderer(mSurfaceRenderer);
-            //mGlSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
             rendererSet = true;
 
@@ -395,7 +404,6 @@ public class MainActivity extends AppCompatActivity {
         else
         {
             Toast.makeText(MainActivity.this,"This device does not support OpenGl ES 2.0",Toast.LENGTH_LONG).show();
-            //return;
         }
     }
     private boolean isProbablyEmulator() {
