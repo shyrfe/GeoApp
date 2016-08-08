@@ -12,6 +12,7 @@ import com.google.android.gms.location.places.Places;
 public class SearchResultActivity extends AppCompatActivity
 {
     GoogleAPIWrapper mGoogleAPIWrapper;
+    GooglePlacesSearch mGooglePlacesSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,8 +20,7 @@ public class SearchResultActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 
-        mGoogleAPIWrapper = new GoogleAPIWrapper(this);
+        //mGoogleAPIWrapper = new GoogleAPIWrapper(this);
+        mGooglePlacesSearch = new GooglePlacesSearch();
     }
-
-
 }

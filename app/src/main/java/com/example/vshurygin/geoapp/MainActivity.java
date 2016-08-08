@@ -20,7 +20,7 @@ package com.example.vshurygin.geoapp;
 
  17)API с запросами по чему либо, магазины, кафе, музеи...(гугловские скорее всего) запросы через json (наверно)
  18)новый активити с отображением таблицы с результатами поиска по карте
-
+ 19)REST api посмотреть
 * */
 import android.Manifest;
 import android.app.ActivityManager;

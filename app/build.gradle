@@ -5,6 +5,7 @@ model {
         compileSdkVersion 23
         buildToolsVersion "23.0.3"
 
+
         defaultConfig {
             applicationId "com.example.vshurygin.geoapp"
             minSdkVersion.apiLevel 22

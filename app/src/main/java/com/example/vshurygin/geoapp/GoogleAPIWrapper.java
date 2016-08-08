@@ -7,6 +7,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataApi;
+import com.google.android.gms.location.places.PlaceDetectionApi;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 /**
  * Created by vshurygin on 05.08.2016.
@@ -22,7 +26,8 @@ public class GoogleAPIWrapper implements GoogleApiClient.OnConnectionFailedListe
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
     }
