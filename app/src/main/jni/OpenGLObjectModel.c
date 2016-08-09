@@ -45,9 +45,9 @@ void addObjectVertexData(float _x , float _y, float _z)
 {
     int i = 0;
     int j = 0;
-    ALOG("GLOBAL do %i",global_vertex_buffer_size);
+    //ALOG("GLOBAL do %i",global_vertex_buffer_size);
     global_vertex_buffer_size += LOCAL_CUBE_VERTICES_BUFFER_SIZE;
-    ALOG("GLOBAL posle %i",global_vertex_buffer_size);
+    //ALOG("GLOBAL posle %i",global_vertex_buffer_size);
     G_vertex_buffer_data = (float*)realloc(G_vertex_buffer_data,(sizeof(float)*global_vertex_buffer_size));
 
     int vertexNumber = ((global_vertex_buffer_size/LOCAL_CUBE_VERTICES_BUFFER_SIZE)-1);

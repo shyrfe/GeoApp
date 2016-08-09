@@ -66,6 +66,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -149,8 +150,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
-                startActivity(intent);
+                if (isServiceRunning(GeoAppService.class) && mIsServiceBind)
+                {
+                    Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
+
+                    Record r = mLocalGeoAppService.mRecordLog.getLastRecord();
+                    //Log.d("LatLong",r.getLatitude() + " " + r.getLongitude());
+                    intent.putExtra("latitude",r.getLatitude());
+                    intent.putExtra("longitude",r.getLongitude());
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this,R.string.serviceAreNotStarted,Toast.LENGTH_SHORT).show();
+                }
 
                 //Toast.makeText(MainActivity.this,"SearchOK!",Toast.LENGTH_SHORT).show();
             }
@@ -220,8 +233,8 @@ public class MainActivity extends AppCompatActivity {
                     else
                     {
                         mPlayDelayMarkersButton.setText(R.string.playButton);
-                        Log.d("Play","Server not start!");
-                        Toast.makeText(MainActivity.this,"Запустите сервис!",Toast.LENGTH_LONG).show();
+                        Log.d("Play","Service not start!");
+                        Toast.makeText(MainActivity.this,R.string.serviceAreNotStarted,Toast.LENGTH_LONG).show();
                     }
                 }
                 else

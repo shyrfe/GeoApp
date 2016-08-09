@@ -12,28 +12,36 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by vshurygin on 08.08.2016.
  */
 public class GooglePlacesSearch
 {
-    HttpURLConnection urlConnection = null;
+    private String[] mPlaces = null;
+    private final String GOOGLE_API_PLACE_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?";
 
-    private String mURL = "https://maps.googleapis.com/maps/api/place/search/json?";
-    //private String mURL = "https://maps.googleapis.com";
-    GooglePlacesSearch()
+    GooglePlacesSearch() {}
+
+
+    public void setPlaces(double _latitude, double _longitude, double _radius, String _types)
     {
-        String result ;
-
-        new ProgressTask(mURL,54.1834903,37.6082967,1000,null).execute();
+        new ProgressTask(GOOGLE_API_PLACE_SEARCH_URL,_latitude,_longitude,_radius,_types).execute();
     }
 
+    public String[] getPlaces()
+    {
+        if (mPlaces != null)
+        {
+            return mPlaces;
+        }
+        return null;
+    }
 
 
     class ProgressTask extends AsyncTask<String,Void,String>
     {
-
         private String mURL;
         private double mLatitude;
         private double mLongitude;
@@ -53,12 +61,13 @@ public class GooglePlacesSearch
             StringBuilder result = new StringBuilder();
 
             result.append(mURL);
+            result.append("language=ru&");
             result.append("location="+mLatitude+","+mLongitude+"&");
             result.append("radius="+mRadius+"&");
             result.append("sensor=false&");
             if (mTypes != null)
             {
-                result.append("types="+mTypes+"&");
+                result.append("type="+mTypes+"&");
             }
             result.append("key=AIzaSyCHpwqjnrTJVCh4gv0szpdibd6KGl5_vjg");
 
@@ -127,11 +136,19 @@ public class GooglePlacesSearch
             try
             {
                 jsonObject = new JSONObject(result);
-                JSONArray names = jsonObject.getJSONArray("results");
-                for (int i = 0; i < names.length();i++)
+                JSONArray results = jsonObject.getJSONArray("results");
+
+
+                ArrayList<String> placesArray = new ArrayList<>();
+                for (int i = 0; i < results.length();i++)
                 {
-                    Log.d("PlacesSearch",names.getJSONObject(i).getString("name"));
+                    placesArray.add(results.getJSONObject(i).getString("name"));
+
+                    //Log.d("PlacesSearch",results.getJSONObject(i).getString("name"));
                 }
+                mPlaces = new String[placesArray.size()];
+                mPlaces = placesArray.toArray(mPlaces);
+
             }
             catch (Exception e)
             {e.printStackTrace();}

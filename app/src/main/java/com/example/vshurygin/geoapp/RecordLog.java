@@ -43,146 +43,20 @@ public class RecordLog {
 
     RecordLog(String path, Context context)
     {
-            /*mPath = path;*/
         mContext = context;
 
         mRecordsDataBase = new RecordsDataBase(mContext);
         SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
-        //db.delete("records",null,null);
-        //db.close();
-        //SQLiteDatabase db = dataBase.getWritableDatabase();
-        //ContentValues cv = new ContentValues();
-        //cv.put("timestamp",10);
-        //db.insert("records",null,cv);
-        //Cursor c = db.query("records",null,null,null,null,null,null);
-       // if (c.moveToFirst())
-        //{
-            //int time = c.getColumnIndex("timestamp");
-            //Log.d("DATABASE",String.valueOf(c.getInt(time)));
 
-        //}
-        //dataBase.close();
-
-            /*File sdPath = Environment.getExternalStorageDirectory();
-            sdPath = new File(sdPath.getAbsolutePath()+"/"+mPath);
-            sdPath.mkdirs();*/
-
-            /*mSdFile = new File(sdPath,FILE_NAME);
-            mSharPref = context.getSharedPreferences(Record.LOCAL_PREFERENCES,context.MODE_PRIVATE);*/
-
-            /*try
-            {
-                    if (mSdFile.exists() && mSdFile.isFile())
-                    {
-                        Log.d("RecordFile", "found");
-                        WriterSwitch(true);
-                    }
-                    else
-                    {
-                        Log.d("RecordFile", "notfound");
-
-                        SharedPreferences.Editor ed = mSharPref.edit();
-                        ed.putInt("RECORD_COUNT",0);
-                        ed.commit();
-
-                        WriterSwitch(true);
-                        mWriter.write("<root>\n");
-                        mWriter.write("</root>");
-                    }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            catch (SecurityException se)
-            {
-                se.printStackTrace();
-            }
-*/
     }
 
     public void add(Record r)
     {
-        /*
-        if (stream not opened)
-        {
-            if (file not exists)
-            {
-                create file
-                write xml header
-            }
-
-            open file stream
-            open buf stream
-        }
-         */
-
         SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
         db.insert("records",null,r.toContentValues());
         db.close();
-        /*try
-        {
-            clearLastLine(mSdFile);
-            if (!mIsOpen && (!mSdFile.exists()))
-            {
-
-                File sdPath = Environment.getExternalStorageDirectory();
-                sdPath = new File(sdPath.getAbsolutePath()+"/"+mPath);
-                sdPath.mkdirs();
-                mSdFile = new File(sdPath,FILE_NAME);
-
-                WriterSwitch(true);
-                mWriter.write("<root>"+ System.getProperty("line.separator"));
-                mWriter.write("</root>");
-
-                SharedPreferences.Editor ed = mSharPref.edit();
-                ed.putInt("RECORD_COUNT",0);
-                ed.commit();
-            }
-            else if (!mIsOpen)
-            {
-                WriterSwitch(true);
-            }
-
-            long lastId;
-
-            if ((lastId = mSharPref.getLong("LAST_ID",0)) == 0)
-            {
-                lastId = 1;
-                SharedPreferences.Editor ed = mSharPref.edit();
-                ed.putLong("LAST_ID",lastId);
-                ed.commit();
-                Log.d("LastId","0");
-            }
-            else
-            {
-                lastId++;
-                SharedPreferences.Editor ed = mSharPref.edit();
-                ed.putLong("LAST_ID",lastId);
-                ed.commit();
-                Log.d("LastId",String.valueOf(lastId));
-            }
-
-            r.setId(lastId);
-            mWriter.write(r.toString());
-            mWriter.write("</root>");
-
-
-            int count = mSharPref.getInt("RECORD_COUNT",0);
-            count++;
-            SharedPreferences.Editor ed = mSharPref.edit();
-            ed.putInt("RECORD_COUNT",count);
-            ed.commit();
-
-            Log.d("SD", "Файл записан");
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }*/
-
-
     }
+
     public List<Record> readAll()
     {
         ArrayList<Record> AllRecords = new ArrayList<Record>();
@@ -224,40 +98,6 @@ public class RecordLog {
         catch (Exception e)
         {e.printStackTrace();}
 
-
-        /*try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
-            String tmp;
-            StringBuilder recordString;
-            while((tmp = reader.readLine()) != null)
-            {
-                if (tmp.equals("<coordinate>"))
-                {
-                    recordString = new StringBuilder(tmp);
-                    while (!tmp.equals("</coordinate>") )
-                    {
-                        tmp = reader.readLine();
-                        recordString.append(tmp);
-                    }
-                    AllRecords.add(Record.parse(recordString.toString()));
-                    recordString = null;
-                }
-            }
-            reader.close();
-        }
-        catch (FileNotFoundException exception)
-        {
-            exception.printStackTrace();
-        }
-        catch (IOException exception)
-        {
-            exception.printStackTrace();
-        }
-        finally
-        {
-            WriterSwitch(true);
-        }*/
         return AllRecords;
     }
 
@@ -287,30 +127,6 @@ public class RecordLog {
         }
         catch (Exception e)
         {e.printStackTrace();}
-        //int length = mSharPref.getInt("RECORD_COUNT",0);
-        /*try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
-            String tmp;
-            while((tmp = reader.readLine()) != null)
-            {
-                //Log.d("count",tmp);
-                if (tmp.equals("<coordinate>"))
-                {
-                    length++;
-                }
-            }
-            reader.close();
-        }
-        catch (FileNotFoundException exception)
-        {
-            exception.printStackTrace();
-        }
-        catch (IOException exception)
-        {
-            exception.printStackTrace();
-        }
-        */
 
         return 0;
     }
@@ -352,46 +168,44 @@ public class RecordLog {
 
             return r;
         }
+    }
 
-        /*WriterSwitch(false);
+    public Record getLastRecord()
+    {
+        SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
+        Cursor c = db.query("records",null,null,null,null,null,null);
         try
         {
-            BufferedReader reader = new BufferedReader(new FileReader(mSdFile));
-            String tmp;
-            StringBuilder recordString;
-            for (int i = 0; i < mLastRead; i++){reader.readLine();}
-            while((tmp = reader.readLine()) != null)
-            {
-                mLastRead++;
-                if (tmp.equals("<coordinate>"))
-                {
-                    recordString = new StringBuilder(tmp);
-                    while (!tmp.equals("</coordinate>") )
-                    {
-                        tmp = reader.readLine();
-                        mLastRead++;
-                        recordString.append(tmp);
-                    }
-                    record = Record.parse(recordString.toString());
-                    return record;
-                }
-            }
-            reader.close();
-        }
-        catch (FileNotFoundException exception)
-        {
-            exception.printStackTrace();
-        }
-        catch (IOException exception)
-        {
-            exception.printStackTrace();
-        }
-        finally
-        {
-            WriterSwitch(true);
-        }*/
+            c.moveToLast();
+            int idColIndex = c.getColumnIndex("id");
+            int timeStampColIndex = c.getColumnIndex("timestamp");
+            int imeiColIndex = c.getColumnIndex("imei");
+            int intervalColIndex = c.getColumnIndex("interval");
+            int commentColIndex = c.getColumnIndex("comment");
+            int latitudeColIndex = c.getColumnIndex("latitude");
+            int longitudeColIndex = c.getColumnIndex("longitude");
+            int radiusColIndex = c.getColumnIndex("radius");
+            int speedColIndex = c.getColumnIndex("speed");
 
-        //return null;
+            Record r = new Record(
+                    c.getLong(idColIndex),
+                    c.getLong(timeStampColIndex),
+                    c.getString(imeiColIndex),
+                    c.getInt(intervalColIndex),
+                    c.getString(commentColIndex),
+                    c.getDouble(latitudeColIndex),
+                    c.getDouble(longitudeColIndex),
+                    c.getFloat(radiusColIndex),
+                    c.getFloat(speedColIndex)
+            );
+            return r;
+        }
+        catch (Exception e){e.printStackTrace();}
+        finally {
+            db.close();
+        }
+
+        return null;
     }
 
     private void clearLastLine(File file)
