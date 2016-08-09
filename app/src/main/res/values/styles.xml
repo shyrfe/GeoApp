@@ -7,5 +7,17 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    `
+    <style name="CustomListViewTheme" parent="@android:style/Theme.Holo">
+        <item name="android:listViewStyle">@style/CustomListView</item>
+        <item name="android:textViewStyle">@style/CustomTextView</item>
+    </style>
 
+    <style name="CustomListView" parent="android:style/Widget.ListView">
+        <item name="android:fastScrollEnabled">true</item>
+    </style>
+
+    <style name="CustomTextView" parent="android:style/Widget.TextView">
+        <item name="android:background">@drawable/search_result_view_list_item_gradient</item>
+    </style>
 </resources>

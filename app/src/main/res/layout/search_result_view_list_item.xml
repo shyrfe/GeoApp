@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/CustomTextView"
     android:id="@+id/textView1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="5dp"
     android:text="TextView"
     android:textColor="#686666"
+
+
+    android:shadowColor="@color/text_shadow_white"
+    android:shadowDx="2"
+    android:shadowDy="2"
+    android:shadowRadius="1"
     android:textSize="24sp"
-    android:gravity="left">
+    android:gravity="left"
+    android:allowUndo="false"
+    android:typeface="serif"
+    android:textStyle="italic">
+
 </TextView>
