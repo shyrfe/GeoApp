@@ -298,9 +298,14 @@ public class MainActivity extends AppCompatActivity {
                 if(isCheaked)
                 {
                     mStatusView.setText("Service Status: ON");
-                    Intent intent = new Intent(MainActivity.this, GeoAppService.class);
-                    startService(intent);
-                    bindService(intent,mServiceConection, Context.BIND_AUTO_CREATE);
+                    try
+                    {
+                        Intent intent = new Intent(MainActivity.this, GeoAppService.class);
+                        startService(intent);
+                        bindService(intent,mServiceConection, Context.BIND_AUTO_CREATE);
+                    }
+                    catch (Exception e){e.printStackTrace();}
+
 
                     Timer checkTimer = new Timer();
                     checkTimer.schedule(new TimerTask(){
@@ -309,7 +314,12 @@ public class MainActivity extends AppCompatActivity {
                         {
                             if(!mLocalGeoAppService.isProvideEnabled())
                             {
-                                startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                                try
+                                {
+                                    startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                                }
+                                catch (Exception e)
+                                {e.printStackTrace();}
                             }
                             //mLocalGeoAppService.mapManipulation.showAllMarkers();
                             //mLocalGeoAppService.mapManipulation.showAllMarkers();

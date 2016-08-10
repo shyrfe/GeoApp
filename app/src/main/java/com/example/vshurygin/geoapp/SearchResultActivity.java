@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,10 +20,11 @@ import java.util.TimerTask;
 
 public class SearchResultActivity extends AppCompatActivity
 {
-
+    Intent mIntent;
     GooglePlacesSearch mGooglePlacesSearch;
     ListView mSearchResultViewList;
-    String[] mResult;
+    PlaceInfo[] mResult;
+    String[] mResultNames;
     final int RADIUS = 1000;
     final String PLACES_TYPE = "food|store|liquor_store";
 
@@ -31,12 +34,12 @@ public class SearchResultActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 ////////////////////////////////////////////////////////////////////////////////////////////////
-        Intent intent = getIntent();
-        double latitude = intent.getDoubleExtra("latitude",0);
-        double longitude = intent.getDoubleExtra("longitude",0);
+        mIntent = getIntent();
+        double latitude = mIntent.getDoubleExtra("latitude",0);
+        double longitude = mIntent.getDoubleExtra("longitude",0);
 ////////////////////////////////////////////////////////////////////////////////////////////////
         mSearchResultViewList = (ListView)findViewById(R.id.SearchResultViewList);
-
+        mSearchResultViewList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 ////////////////////////////////////////////////////////////////////////////////////////////////
         mGooglePlacesSearch = new GooglePlacesSearch();
         mGooglePlacesSearch.setPlaces(latitude,longitude,RADIUS,PLACES_TYPE);
@@ -50,29 +53,40 @@ public class SearchResultActivity extends AppCompatActivity
 
                     if (mResult != null)
                     {
-
+                        mResultNames = new String[mResult.length];
+                        for (int i = 0; i < mResultNames.length; i++)
+                        {
+                            mResultNames[i] = mResult[i].getName();
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run()
                             {
                                 try
                                 {
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchResultActivity.this,R.layout.search_result_view_list_item,mResult);
+                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchResultActivity.this,R.layout.search_result_view_list_item,mResultNames);
                                     mSearchResultViewList.setAdapter(adapter);
                                 }
                                 catch (Exception e)
                                 {e.printStackTrace();}
-
                             }
                         });
                     }
                 }
                 catch (Exception e)
                 {e.printStackTrace();}
-
-
             }
         },1000);
 ////////////////////////////////////////////////////////////////////////////////////////////////
+        mSearchResultViewList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent intent = new Intent(SearchResultActivity.this,SearchItemDetail.class);
+                intent.putExtra("PlaceInfo",mResult[position]);
+                startActivity(intent);
+                /*Log.d("List",String.valueOf(position));*/
+            }
+        });
     }
 }

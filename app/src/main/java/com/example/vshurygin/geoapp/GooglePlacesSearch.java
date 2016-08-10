@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class GooglePlacesSearch
 {
-    private String[] mPlaces = null;
+    private PlaceInfo[] mPlaces = null;
     private final String GOOGLE_API_PLACE_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?";
 
     GooglePlacesSearch() {}
@@ -30,7 +30,7 @@ public class GooglePlacesSearch
         new ProgressTask(GOOGLE_API_PLACE_SEARCH_URL,_latitude,_longitude,_radius,_types).execute();
     }
 
-    public String[] getPlaces()
+    public PlaceInfo[] getPlaces()
     {
         if (mPlaces != null)
         {
@@ -138,15 +138,35 @@ public class GooglePlacesSearch
                 jsonObject = new JSONObject(result);
                 JSONArray results = jsonObject.getJSONArray("results");
 
-
-                ArrayList<String> placesArray = new ArrayList<>();
+                ArrayList<PlaceInfo> placesArray = new ArrayList<>();
                 for (int i = 0; i < results.length();i++)
                 {
-                    placesArray.add(results.getJSONObject(i).getString("name"));
+                    if ( !results.getJSONObject(i).isNull("photos"))
+                    {
+                        JSONArray photos = results.getJSONObject(i).getJSONArray("photos");
+                        placesArray.add(new PlaceInfo(
+                                results.getJSONObject(i).getString("name"),
+                                results.getJSONObject(i).getString("icon"),
+                                results.getJSONObject(i).getString("vicinity"),
+                                results.getJSONObject(i).getString("place_id"),
+                                photos.getJSONObject(0).getString("photo_reference")
+                        ));
+                    }
+                    else
+                    {
+                        placesArray.add(new PlaceInfo(
+                                results.getJSONObject(i).getString("name"),
+                                results.getJSONObject(i).getString("icon"),
+                                results.getJSONObject(i).getString("vicinity"),
+                                results.getJSONObject(i).getString("place_id"),
+                                null
+                        ));
+                    }
 
                     //Log.d("PlacesSearch",results.getJSONObject(i).getString("name"));
                 }
-                mPlaces = new String[placesArray.size()];
+
+                mPlaces = new PlaceInfo[placesArray.size()];
                 mPlaces = placesArray.toArray(mPlaces);
 
             }
