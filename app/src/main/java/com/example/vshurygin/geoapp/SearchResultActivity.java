@@ -15,6 +15,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -64,8 +67,11 @@ public class SearchResultActivity extends AppCompatActivity
                             {
                                 try
                                 {
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchResultActivity.this,R.layout.search_result_view_list_item,mResultNames);
-                                    mSearchResultViewList.setAdapter(adapter);
+                                    ArrayList<PlaceInfo> placesInfoArray = new ArrayList<PlaceInfo>();
+                                    placesInfoArray.addAll(Arrays.asList(mResult));
+                                    //ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchResultActivity.this,R.layout.search_result_view_list_item,R.id.searchPlaceName,mResultNames);
+                                    PlaceInfoAdapter placeInfoAdapter= new PlaceInfoAdapter(SearchResultActivity.this,placesInfoArray);
+                                    mSearchResultViewList.setAdapter(placeInfoAdapter);
                                 }
                                 catch (Exception e)
                                 {e.printStackTrace();}
@@ -89,4 +95,5 @@ public class SearchResultActivity extends AppCompatActivity
             }
         });
     }
+
 }

@@ -292,6 +292,13 @@ public class MainActivity extends AppCompatActivity {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         mOnOffTogButton = (ToggleButton)findViewById(R.id.ONOFFtogButton);
         mOnOffTogButton.setChecked(isServiceRunning(GeoAppService.class)?true:false);
+        mOnOffTogButton.setClickable(false);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mOnOffTogButton.setClickable(true);
+            }
+        },1000);
         mOnOffTogButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isCheaked)
             {
@@ -312,17 +319,19 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run()
                         {
-                            if(!mLocalGeoAppService.isProvideEnabled())
+                            try
                             {
-                                try
+                                if(!mLocalGeoAppService.isProvideEnabled())
                                 {
-                                    startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+
+                                       startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+
                                 }
-                                catch (Exception e)
-                                {e.printStackTrace();}
+                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
+                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
                             }
-                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
-                            //mLocalGeoAppService.mapManipulation.showAllMarkers();
+                            catch (Exception e)
+                            {e.printStackTrace();}
                         }
                     },500);
                 }
