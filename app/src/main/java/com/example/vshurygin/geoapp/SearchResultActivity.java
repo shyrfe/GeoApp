@@ -1,6 +1,7 @@
 package com.example.vshurygin.geoapp;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ public class SearchResultActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 ////////////////////////////////////////////////////////////////////////////////////////////////
         mIntent = getIntent();
         double latitude = mIntent.getDoubleExtra("latitude",0);
@@ -88,9 +90,9 @@ public class SearchResultActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent intent = new Intent(SearchResultActivity.this,SearchItemDetail.class);
+                /*Intent intent = new Intent(SearchResultActivity.this,SearchItemDetail.class);
                 intent.putExtra("PlaceInfo",mResult[position]);
-                startActivity(intent);
+                startActivity(intent);*/
                 /*Log.d("List",String.valueOf(position));*/
             }
         });

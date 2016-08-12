@@ -32,7 +32,7 @@ public class PlaceInfoAdapter extends BaseAdapter
         mContext = _context;
         mPlaces = _places;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mImageLoader = new ImageLoader();
+        mImageLoader = new ImageLoader(mContext);
     }
 
     @Override
@@ -69,7 +69,10 @@ public class PlaceInfoAdapter extends BaseAdapter
         if (p.getImageAdress() != null)
         {
             //new DownloadImageTask((ImageView)view.findViewById(R.id.placeImage)).execute(p.getImageAdress());
-            mImageLoader.LoadImage(mContext,3600,p.getImageAdress(),((ImageView)view.findViewById(R.id.placeImage)));
+            //mImageLoader.LoadImage(mContext,3600,p.getImageAdress(),((ImageView)view.findViewById(R.id.placeImage)));
+            ImageView imageView = (ImageView)view.findViewById(R.id.placeImage);
+            mImageLoader.setBitMapWidthAndHeight(imageView.getWidth(),imageView.getHeight());
+            mImageLoader.DisplayImage(p.getImageAdress(),imageView);
         }
         else
         {

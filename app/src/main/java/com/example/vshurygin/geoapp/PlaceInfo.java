@@ -33,8 +33,8 @@ public class PlaceInfo implements Parcelable
         mPhotoReference = _photo_reference;
         if (mPhotoReference != null)
         {
-            //mImageAdress = GOOGLE_URL+"maxwidth="+MAX_WIDTH+"&"+"photoreference="+mPhotoReference+"&"+"key="+KEY;
-            mImageAdress = "https://maps.gstatic.com/mapfiles/place_api/icons/shopping-71.png";
+            mImageAdress = GOOGLE_URL+"maxwidth="+MAX_WIDTH+"&"+"photoreference="+mPhotoReference+"&"+"key="+KEY;
+            //mImageAdress = "https://maps.gstatic.com/mapfiles/place_api/icons/shopping-71.png";
         }
         else
         {
