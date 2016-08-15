@@ -19,9 +19,11 @@ public class PlaceInfo implements Parcelable
     private String mVicinity;
     private String mPhotoReference;
     private String mPlaceId;
+    private String mPhoneNumber = null;
+    private String mPlaceAddress = null;
 
     final private String KEY = "AIzaSyCHpwqjnrTJVCh4gv0szpdibd6KGl5_vjg";
-    final private String MAX_WIDTH = "800";
+    final private String MAX_WIDTH = "800";//параметр максимального размера изображения для запроса
     final private String GOOGLE_URL = "https://maps.googleapis.com/maps/api/place/photo?";
 
     PlaceInfo(String _name, String _iconAdress, String _vicinity,String _placeId,String _photo_reference)
@@ -42,6 +44,15 @@ public class PlaceInfo implements Parcelable
         }
     }
 
+    public void setPhoneNumber(String _number)
+    {
+        mPhoneNumber = _number;
+    }
+    public void setPlaceAddress(String _address)
+    {
+        mPlaceAddress = _address;
+    }
+
     public String getName()
     {
         return mName;
@@ -58,6 +69,8 @@ public class PlaceInfo implements Parcelable
     public String getImageAdress() { return mImageAdress; }
     public String getPlaceId() { return mPlaceId; }
     public String getKey(){ return KEY; }
+    public String getPhoneNumber(){ return mPhoneNumber; }
+    public String getPlaceAddress(){ return mPlaceAddress; }
 
     public int describeContents() {
         return 0;
@@ -70,6 +83,8 @@ public class PlaceInfo implements Parcelable
         parcel.writeString(mVicinity);
         parcel.writeString(mPlaceId);
         parcel.writeString(mPhotoReference);
+        parcel.writeString(mPhoneNumber);
+        parcel.writeString(mPlaceAddress);
     }
 
     public static final Parcelable.Creator<PlaceInfo> CREATOR = new Parcelable.Creator<PlaceInfo>() {
@@ -93,5 +108,7 @@ public class PlaceInfo implements Parcelable
         mVicinity = parcel.readString();
         mPlaceId = parcel.readString();
         mPhotoReference = parcel.readString();
+        mPhoneNumber = parcel.readString();
+        mPlaceAddress = parcel.readString();
     }
 }

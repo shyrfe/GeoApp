@@ -71,10 +71,15 @@ public class SurfaceRendererWrapper implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl)
     {
-        for (int i = 0; i < mAllMarkers.size();i++)
+        try
         {
-            addObject(mAllMarkers.get(i).getXInGLCoord(),mAllMarkers.get(i).getYInGLCoord());
+            for (int i = 0; i < mAllMarkers.size(); i++)
+            {
+                addObject(mAllMarkers.get(i).getXInGLCoord(), mAllMarkers.get(i).getYInGLCoord());
+            }
         }
+        catch (Exception e)
+        {e.printStackTrace();}
         mDrawframe(this);
     }
 

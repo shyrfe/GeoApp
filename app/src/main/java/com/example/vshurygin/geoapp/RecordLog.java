@@ -47,7 +47,8 @@ public class RecordLog {
 
         mRecordsDataBase = new RecordsDataBase(mContext);
         SQLiteDatabase db = mRecordsDataBase.getWritableDatabase();
-
+        //Cursor c = db.rawQuery("DELETE FROM records",new String[]{});
+        //db.delete("records",null,null);
     }
 
     public void add(Record r)

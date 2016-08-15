@@ -64,8 +64,10 @@ public class PlaceInfoAdapter extends BaseAdapter
         PlaceInfo p = getPlaceInfo(_position);
 
         ((TextView) view.findViewById(R.id.searchPlaceName)).setText(p.getName());
-        ((TextView) view.findViewById(R.id.place_address)).setText(p.getVicinity());
+        //((TextView) view.findViewById(R.id.place_address)).setText(p.getVicinity());
 
+        ((TextView) view.findViewById(R.id.place_address)).setText(p.getPlaceAddress() == null?p.getVicinity():p.getPlaceAddress());
+        ((TextView) view.findViewById(R.id.phone_number)).setText(p.getPhoneNumber() == null?" ":p.getPhoneNumber());
         if (p.getImageAdress() != null)
         {
             //new DownloadImageTask((ImageView)view.findViewById(R.id.placeImage)).execute(p.getImageAdress());
@@ -76,7 +78,7 @@ public class PlaceInfoAdapter extends BaseAdapter
         }
         else
         {
-            ((ImageView)view.findViewById(R.id.placeImage)).setImageResource(R.mipmap.default_placeinfo_image);
+            ((ImageView)view.findViewById(R.id.placeImage)).setImageResource(R.mipmap.place_image_not_found);
         }
         return view;
     }
