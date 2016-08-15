@@ -36,6 +36,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
 import android.nfc.Tag;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
@@ -153,19 +154,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                if (isServiceRunning(GeoAppService.class) && mIsServiceBind)
+                ConnectivityManager conManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (conManager.getActiveNetworkInfo() != null)
                 {
-                    Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
+                    if (isServiceRunning(GeoAppService.class) && mIsServiceBind)
+                    {
+                        Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
 
-                    Record r = mLocalGeoAppService.mRecordLog.getLastRecord();
-                    //Log.d("LatLong",r.getLatitude() + " " + r.getLongitude());
-                    intent.putExtra("latitude",r.getLatitude());
-                    intent.putExtra("longitude",r.getLongitude());
-                    startActivity(intent);
+                        Record r = mLocalGeoAppService.mRecordLog.getLastRecord();
+                        //Log.d("LatLong",r.getLatitude() + " " + r.getLongitude());
+                        intent.putExtra("latitude",r.getLatitude());
+                        intent.putExtra("longitude",r.getLongitude());
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Toast.makeText(MainActivity.this,R.string.serviceAreNotStarted,Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else
                 {
-                    Toast.makeText(MainActivity.this,R.string.serviceAreNotStarted,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,R.string.internet_not_found,Toast.LENGTH_SHORT).show();
                 }
 
                 //Toast.makeText(MainActivity.this,"SearchOK!",Toast.LENGTH_SHORT).show();
