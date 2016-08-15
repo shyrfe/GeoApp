@@ -231,7 +231,7 @@ public class MapManipulation {
 
     public void hideAllMarkers()
     {
-        Handler mainHandler = new Handler(Looper.getMainLooper());
+       /* Handler mainHandler = new Handler(Looper.getMainLooper());
         Runnable myRunnable = new Runnable() {
             @Override
             public void run()
@@ -242,7 +242,7 @@ public class MapManipulation {
                 }
             }
         };
-        mainHandler.post(myRunnable);
+        mainHandler.post(myRunnable);*/
     }
 
     public void showAllMarkers()

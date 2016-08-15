@@ -120,4 +120,13 @@
         android:layout_above="@+id/mapView"
         android:layout_alignParentStart="true" />
 
+    <ViewFlipper
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewFlipper"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/ONOFFtogButton"
+        android:layout_alignParentBottom="true" />
+
 </RelativeLayout>
